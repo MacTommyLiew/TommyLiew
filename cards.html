@@ -1,0 +1,1963 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="images/x-icon" href="images/logo.png">
+    <title>Pokémon TCG — Card Collection</title>
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Nunito:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome (social icons) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <style>
+      :root {
+        --bg: #f5f5f5;
+        --surface: #ffffff;
+        --card-w: 120px;
+        --radius: 10px;
+        --gold: #f0c040;
+        --gold2: #ffd700;
+        --text: #1a1a2e;
+        --pink: #ff6eb4;
+        --nav-h: 64px;
+        --nav-bg: #1a1a1a;
+        --accent: #3b4cca;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Nunito", sans-serif;
+        min-height: 100vh;
+        padding-top: 60px;
+      }
+      /* search-wrap styles defined in sub-row section below */
+
+      /* type-row and pill styles defined in sub-row section below */
+
+      /* ══ API INFO BAR ══ */
+      .api-bar {
+        background: #fff;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 0.45rem 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+      }
+      .api-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        background: #e8f5e9;
+        border: 1px solid #a5d6a7;
+        border-radius: 6px;
+        padding: 0.2rem 0.65rem;
+        font-size: 0.67rem;
+        font-weight: 800;
+        color: #2e7d32;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+      .live-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #4caf50;
+        box-shadow: 0 0 6px #4caf50;
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+      .api-endpoint {
+        font-size: 0.67rem;
+        color: #444;
+        font-family: monospace;
+      }
+      .api-method {
+        font-size: 0.62rem;
+        font-weight: 800;
+        color: #43a047;
+        letter-spacing: 0.06em;
+      }
+      #apiStatus {
+        margin-left: auto;
+        font-size: 0.68rem;
+        color: #444;
+        font-weight: 600;
+      }
+
+      /* ══ GRID ══ */
+      .grid-section {
+        background: var(--bg);
+        position: relative;
+        z-index: 1;
+        padding: 1.5rem 2rem 3rem;
+      }
+      .section-row {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 1.2rem;
+        flex-wrap: wrap;
+      }
+      .section-title {
+        font-family: "Cinzel Decorative", serif;
+        font-size: 0.88rem;
+        color: #3b4cca;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+      #count-label {
+        font-size: 0.75rem;
+        color: #444;
+      }
+      .page-controls {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .page-btn {
+        padding: 0.3rem 0.8rem;
+        border-radius: 999px;
+        background: #fff;
+        border: 1.5px solid #ddd;
+        color: #555;
+        font-size: 0.72rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-family: "Nunito", sans-serif;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      }
+      .page-btn:hover:not(:disabled) {
+        background: #3b4cca;
+        border-color: #3b4cca;
+        color: #fff;
+      }
+      .page-btn:disabled {
+        opacity: 0.3;
+        cursor: default;
+      }
+      #page-label {
+        font-size: 0.72rem;
+        color: #333;
+        padding: 0 0.3rem;
+        font-weight: 700;
+      }
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        gap: 12px;
+      }
+
+      /* skeleton */
+      .skeleton {
+        width: 100%;
+        aspect-ratio: 63/88;
+        border-radius: var(--radius);
+        background: linear-gradient(
+          90deg,
+          #e0e0e0 25%,
+          #ececec 50%,
+          #e0e0e0 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.4s infinite;
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      /* ══ CARD ══ */
+      .pcard {
+        width: 100%;
+        aspect-ratio: 63/88;
+        border-radius: var(--radius);
+        position: relative;
+        cursor: pointer;
+        perspective: 800px;
+        overflow: visible;
+      }
+      .pcard:not(.flipped):hover .card-flip-inner {
+        transform: translateY(-6px) scale(1.05);
+      }
+      .pcard:not(.flipped):hover .card-img-wrap {
+        box-shadow:
+          0 14px 40px rgba(0, 0, 0, 0.22),
+          0 0 0 2px #ffcb05;
+      }
+      .card-flip-inner {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: var(--radius);
+      }
+      .pcard.flipped .card-flip-inner {
+        transform: rotateY(180deg);
+      }
+      .card-front,
+      .card-back {
+        position: absolute;
+        inset: 0;
+        border-radius: var(--radius);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      }
+      .card-img-wrap {
+        width: 100%;
+        height: 100%;
+        border-radius: var(--radius);
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        transition: box-shadow 0.18s;
+        background: #e8e8e8;
+      }
+      .card-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.25s;
+      }
+      .pcard:hover .card-img-wrap img {
+        transform: scale(1.04);
+      }
+      .card-img-wrap::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          130deg,
+          rgba(255, 255, 255, 0) 30%,
+          rgba(255, 255, 255, 0.12) 50%,
+          rgba(255, 255, 255, 0) 70%
+        );
+        pointer-events: none;
+      }
+
+      /* card back */
+      .card-back {
+        transform: rotateY(180deg);
+        background: linear-gradient(145deg, #1a1040, #2d1b6e, #1a1040);
+        border: 1.5px solid rgba(255, 215, 0, 0.4);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 8px;
+        overflow: hidden;
+      }
+      .card-back::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(
+            circle at 50% 50%,
+            rgba(255, 215, 0, 0.08) 0%,
+            transparent 55%
+          ),
+          repeating-linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.02) 0px,
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px,
+            transparent 12px
+          );
+        border-radius: var(--radius);
+      }
+      .back-ball {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: conic-gradient(#e53935 0deg 180deg, #fff 180deg 360deg);
+        border: 2.5px solid #fff;
+        position: relative;
+        flex-shrink: 0;
+        box-shadow: 0 0 14px rgba(255, 215, 0, 0.25);
+        z-index: 1;
+      }
+      .back-ball::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2.5px solid #333;
+      }
+      .back-name {
+        font-family: "Cinzel Decorative", serif;
+        font-size: 0.5rem;
+        font-weight: 700;
+        color: var(--gold2);
+        text-align: center;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        z-index: 1;
+        position: relative;
+      }
+      .back-type {
+        font-size: 0.38rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 2px 7px;
+        border-radius: 999px;
+        background: var(--tc, #888);
+        color: #fff;
+        z-index: 1;
+        position: relative;
+      }
+      .back-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        width: 100%;
+        z-index: 1;
+        position: relative;
+      }
+      .back-stat-row {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 4px;
+        padding: 2px 5px;
+      }
+      .back-stat-label {
+        font-size: 0.34rem;
+        color: rgba(255, 255, 255, 0.5);
+        font-weight: 700;
+        text-transform: uppercase;
+        width: 20px;
+        flex-shrink: 0;
+      }
+      .back-stat-bar {
+        flex: 1;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+      .back-stat-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--tc, #888), var(--gold2));
+      }
+      .back-stat-val {
+        font-size: 0.38rem;
+        font-weight: 800;
+        color: var(--gold2);
+        width: 20px;
+        text-align: right;
+        flex-shrink: 0;
+      }
+      .back-set {
+        font-size: 0.34rem;
+        color: rgba(255, 255, 255, 0.25);
+        z-index: 1;
+        position: relative;
+        text-align: center;
+      }
+
+      /* heart */
+      .heart-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        z-index: 20;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.85);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.82rem;
+        line-height: 1;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+        transition:
+          transform 0.2s,
+          background 0.2s;
+      }
+      .heart-btn:hover {
+        transform: scale(1.3);
+        background: #fff;
+      }
+      .heart-icon.on {
+        animation: heartPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      @keyframes heartPop {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.6);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      /* ══ MODAL ══ */
+      .card-modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 600;
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        padding: 1rem;
+        overflow-y: auto;
+      }
+      .card-modal-overlay.open {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .modal-wrap {
+        display: flex;
+        gap: 2rem;
+        align-items: flex-start;
+        max-width: 700px;
+        width: 100%;
+      }
+      .card-modal-overlay.open .modal-wrap {
+        animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      }
+      @keyframes modalIn {
+        from {
+          transform: scale(0.7);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .modal-card-zone {
+        flex-shrink: 0;
+        width: 230px;
+        perspective: 1000px;
+        position: relative;
+      }
+      .modal-flip-inner {
+        width: 100%;
+        aspect-ratio: 63/88;
+        transform-style: preserve-3d;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 14px;
+        cursor: pointer;
+      }
+      .card-modal-overlay.show-back .modal-flip-inner {
+        transform: rotateY(180deg);
+      }
+      .modal-front,
+      .modal-back {
+        position: absolute;
+        inset: 0;
+        border-radius: 14px;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      }
+      .modal-back {
+        transform: rotateY(180deg);
+      }
+      .modal-front img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 14px;
+        display: block;
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+      }
+      .flip-hint {
+        text-align: center;
+        margin-top: 0.6rem;
+        font-size: 0.67rem;
+        color: rgba(255, 255, 255, 0.5);
+        letter-spacing: 0.06em;
+      }
+      .modal-close {
+        position: absolute;
+        top: -12px;
+        right: -12px;
+        z-index: 10;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #fff;
+        border: 1.5px solid #ddd;
+        color: #555;
+        font-size: 0.85rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+      .modal-close:hover {
+        background: #ff4444;
+        color: #fff;
+        border-color: #ff4444;
+      }
+
+      /* modal info panel — white card */
+      .modal-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+        background: #fff;
+        border-radius: 16px;
+        padding: 1.4rem;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+      }
+      .modal-name {
+        font-family: "Cinzel Decorative", serif;
+        font-size: 1.25rem;
+        font-weight: 900;
+        color: #1a1a2e;
+        line-height: 1.2;
+      }
+      .modal-meta {
+        display: flex;
+        gap: 0.55rem;
+        flex-wrap: wrap;
+      }
+      .meta-tag {
+        padding: 0.22rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .tag-type {
+        color: #fff;
+      }
+      .tag-hp {
+        background: rgba(255, 80, 80, 0.12);
+        border: 1px solid rgba(255, 80, 80, 0.25);
+        color: #d32f2f;
+      }
+      .tag-rarity {
+        background: #fff8e1;
+        border: 1px solid #ffe082;
+        color: #f57f17;
+      }
+      .tag-set {
+        background: #f5f5f5;
+        border: 1px solid #ddd;
+        color: #666;
+      }
+
+      .modal-section-title {
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #aaa;
+      }
+      .modal-attacks {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+      }
+      .attack-row {
+        background: #f8f8f8;
+        border-radius: 10px;
+        padding: 0.55rem 0.75rem;
+        border-left: 3px solid var(--tc, #3b4cca);
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+      }
+      .attack-cost {
+        display: flex;
+        gap: 3px;
+      }
+      .cost-icon {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: var(--tc, #3b4cca);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.48rem;
+        color: #fff;
+      }
+      .attack-name {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #1a1a2e;
+      }
+      .attack-text {
+        font-size: 0.62rem;
+        color: #888;
+        font-style: italic;
+        margin-top: 0.18rem;
+      }
+      .attack-dmg {
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: #3b4cca;
+        flex-shrink: 0;
+      }
+      .modal-weaknesses {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      .weak-tag {
+        padding: 0.2rem 0.62rem;
+        border-radius: 999px;
+        font-size: 0.65rem;
+        font-weight: 700;
+      }
+
+      /* ══ SOCIAL SHARE ══ */
+      .share-section {
+        border-top: 1px solid #eee;
+        padding-top: 0.85rem;
+      }
+      .share-label {
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #bbb;
+        margin-bottom: 0.55rem;
+      }
+      .share-btns {
+        display: flex;
+        gap: 0.45rem;
+        flex-wrap: wrap;
+      }
+      .share-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.42rem;
+        padding: 0.4rem 0.85rem;
+        border-radius: 999px;
+        border: none;
+        font-size: 0.74rem;
+        font-weight: 800;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: "Nunito", sans-serif;
+        transition:
+          transform 0.15s,
+          filter 0.15s,
+          box-shadow 0.15s;
+        letter-spacing: 0.03em;
+      }
+      .share-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+      }
+      .share-btn i {
+        font-size: 0.78rem;
+      }
+      .btn-facebook {
+        background: #1877f2;
+        color: #fff;
+        box-shadow: 0 2px 10px rgba(24, 119, 242, 0.3);
+      }
+      .btn-twitter {
+        background: #000;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+      .btn-whatsapp {
+        background: #25d366;
+        color: #fff;
+        box-shadow: 0 2px 10px rgba(37, 211, 102, 0.3);
+      }
+      .btn-copy {
+        background: #f5f5f5;
+        border: 1.5px solid #ddd;
+        color: #555;
+      }
+      .btn-copy.copied {
+        background: #e8f5e9;
+        border-color: #a5d6a7;
+        color: #2e7d32;
+      }
+
+      /* empty / toast */
+      .empty-state {
+        grid-column: 1/-1;
+        text-align: center;
+        padding: 5rem 1rem;
+        color: #bbb;
+        font-size: 1rem;
+      }
+      .empty-state .big {
+        font-size: 3rem;
+        margin-bottom: 0.8rem;
+      }
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(80px);
+        background: #1a1a2e;
+        border: 1px solid rgba(255, 110, 180, 0.4);
+        color: #fff;
+        padding: 0.6rem 1.3rem;
+        border-radius: 999px;
+        font-size: 0.83rem;
+        font-weight: 700;
+        box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 999;
+        white-space: nowrap;
+      }
+      .toast.show {
+        transform: translateX(-50%) translateY(0);
+      }
+
+      @media (max-width: 1100px) {
+        .card-grid {
+          grid-template-columns: repeat(8, 1fr);
+        }
+      }
+      @media (max-width: 800px) {
+        .card-grid {
+          grid-template-columns: repeat(6, 1fr);
+        }
+      }
+      @media (max-width: 500px) {
+        .card-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 580px) {
+        .modal-wrap {
+          flex-direction: column;
+          align-items: center;
+        }
+        .modal-card-zone {
+          width: 170px;
+        }
+        .modal-name {
+          font-size: 1.05rem;
+        }
+      }
+
+      /* ══ SUB-ROW: search + pills + fav — one white line ══ */
+      .sub-row {
+        background: #fff;
+        border-bottom: 1px solid #ddd;
+        padding: 0.52rem 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: nowrap;
+        position: sticky;
+        top: 60px;
+        z-index: 98;
+        overflow: hidden;
+      }
+      .search-wrap {
+        width: 210px;
+        flex-shrink: 0;
+        position: relative;
+      }
+      .search-wrap input {
+        width: 100%;
+        background: #fff;
+        border: 1.5px solid #555;
+        border-radius: 999px;
+        padding: 0.36rem 1rem 0.36rem 2rem;
+        color: #222;
+        font-family: "Nunito", sans-serif;
+        font-size: 0.84rem;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .search-wrap input::placeholder {
+        color: #aaa;
+      }
+      .search-wrap input:focus {
+        border-color: #111;
+      }
+      .search-icon {
+        position: absolute;
+        left: 0.7rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.78rem;
+        color: #666;
+        pointer-events: none;
+      }
+      /* pills container — no own bg, scrollable, fills remaining space */
+      .type-row {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.32rem;
+        overflow-x: auto;
+        scrollbar-width: none;
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        position: static !important;
+      }
+      .type-row::-webkit-scrollbar {
+        display: none;
+      }
+      /* pills — dark border, white bg, dark text */
+      .pill {
+        padding: 0.22rem 0.75rem;
+        border-radius: 999px;
+        border: 1.5px solid #444;
+        background: #fff;
+        color: #333;
+        font-size: 0.67rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        cursor: pointer;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: all 0.18s;
+        font-family: "Nunito", sans-serif;
+      }
+      .pill:hover {
+        background: #222;
+        color: #fff;
+        border-color: #222;
+      }
+      .pill.active {
+        background: var(--pill-color, #333);
+        border-color: var(--pill-color, #333);
+        color: #fff;
+      }
+      /* fav button */
+      .fav-link {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.38rem;
+        padding: 0.36rem 0.88rem;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #ff6eb4, #c2185b);
+        color: #fff;
+        font-size: 0.76rem;
+        font-weight: 800;
+        text-decoration: none;
+        letter-spacing: 0.04em;
+        box-shadow: 0 2px 10px rgba(255, 110, 180, 0.4);
+        transition: transform 0.15s;
+        white-space: nowrap;
+      }
+      .fav-link:hover {
+        transform: translateY(-1px);
+      }
+      .fav-count {
+        background: rgba(255, 255, 255, 0.28);
+        border-radius: 999px;
+        padding: 0.04rem 0.4rem;
+        font-size: 0.67rem;
+        min-width: 18px;
+        text-align: center;
+      }
+
+      /* ══ CARDS-NAVBAR — no conflict with home.css .navbar ══ */
+      nav.cards-navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: black;
+        padding: 5px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: "Verdana", sans-serif;
+        z-index: 1000;
+        box-sizing: border-box;
+        height: 60px;
+      }
+      nav.cards-navbar .logo-and-welcome {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      nav.cards-navbar .logo img {
+        height: 40px;
+        width: auto;
+      }
+      nav.cards-navbar .welcome-message {
+        color: yellow;
+        font-weight: bold;
+        font-size: 1rem;
+      }
+      nav.cards-navbar ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+      }
+      nav.cards-navbar ul li a {
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+        padding: 6px 10px;
+        transition: all 0.3s;
+        font-family: "Verdana", sans-serif;
+        font-size: 1rem;
+      }
+      nav.cards-navbar ul li a:hover {
+        color: yellow;
+        transform: scale(1.1);
+      }
+      nav.cards-navbar ul li:last-child a {
+        color: #ff6600;
+      }
+      nav.cards-navbar ul li:last-child a:hover {
+        color: yellow;
+        transform: scale(1.1);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAV -->
+    <nav class="cards-navbar">
+      <div class="logo-and-welcome">
+        <div class="logo">
+          <img src="images/logo.png" alt="PokéTCG Logo" />
+        </div>
+        <span id="welcomeUser" class="welcome-message"></span>
+      </div>
+      <ul>
+        <li><a href="about.html">About</a></li>
+        <li><a href="cards.html" class="active">Cards</a></li>
+        <li><a href="favourite.html">Favourite</a></li>
+        <li><a href="beginner.html">For Beginner</a></li>
+        <li><a href="decks.html">Deck Guide</a></li>
+        <li><a href="javascript:void(0)" onclick="logout()">Logout</a></li>
+      </ul>
+    </nav>
+
+    <!-- SEARCH + FILTER + FAV ROW -->
+    <div class="sub-row">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search by name or set…"
+        />
+      </div>
+      <div class="type-row" id="filterBar"></div>
+      <a class="fav-link" href="favourite.html"
+        >♥ Favourites <span class="fav-count" id="favCount">0</span></a
+      >
+    </div>
+
+    <!-- API INFO BAR -->
+    <div class="api-bar">
+      <div class="api-badge"><span class="live-dot"></span> Live API</div>
+      <span class="api-method">GET</span>
+      <span class="api-endpoint">https://api.pokemontcg.io/v2/cards</span>
+      <span id="apiStatus">Fetching cards…</span>
+    </div>
+
+    <!-- GRID -->
+    <div class="grid-section">
+      <div class="section-row">
+        <span class="section-title">All Cards</span>
+        <span id="count-label"></span>
+        <div class="page-controls">
+          <button class="page-btn" id="prevBtn" disabled>← Prev</button>
+          <span id="page-label">Page 1</span>
+          <button class="page-btn" id="nextBtn">Next →</button>
+        </div>
+      </div>
+      <div class="card-grid" id="cardGrid"></div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="card-modal-overlay" id="modalOverlay">
+      <div class="modal-wrap">
+        <div class="modal-card-zone">
+          <div class="modal-flip-inner" id="modalFlip">
+            <div class="modal-front">
+              <button class="modal-close" id="modalClose">✕</button>
+              <img id="modalImg" src="" alt="" />
+            </div>
+            <div class="modal-back" id="modalBack"></div>
+          </div>
+          <div class="flip-hint">click card to flip ↩</div>
+        </div>
+        <div class="modal-info" id="modalInfo"></div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- ══════════ JQUERY SCRIPT ══════════ -->
+    <script>
+      $(function () {
+        /* ─── CONFIG ─────────────────────────────── */
+        const API_BASE = "https://api.pokemontcg.io/v2/cards";
+        const PAGE_SIZE = 50;
+        const API_KEY = ""; // paste your free key from pokemontcg.io for higher limits
+
+        /* ─── TYPE META ──────────────────────────── */
+        const TYPE_COLOR = {
+          Fire: "#FF6B35",
+          Water: "#29B6F6",
+          Grass: "#4CAF50",
+          Lightning: "#FDD835",
+          Psychic: "#AB47BC",
+          Dragon: "#7E57C2",
+          Darkness: "#795548",
+          Metal: "#90A4AE",
+          Fighting: "#E53935",
+          Fairy: "#F48FB1",
+          Colorless: "#A1887F",
+        };
+        const TYPE_GLOW = {
+          Fire: "rgba(255,107,53,.4)",
+          Water: "rgba(79,195,247,.4)",
+          Grass: "rgba(102,187,106,.4)",
+          Lightning: "rgba(255,214,0,.4)",
+          Psychic: "rgba(206,147,216,.4)",
+          Dragon: "rgba(126,87,194,.4)",
+          Darkness: "rgba(121,85,72,.3)",
+          Metal: "rgba(144,164,174,.3)",
+          Fighting: "rgba(229,57,53,.4)",
+          Fairy: "rgba(248,187,208,.4)",
+          Colorless: "rgba(161,136,127,.3)",
+        };
+        const TYPE_PILLS = [
+          "All",
+          "Fire",
+          "Water",
+          "Grass",
+          "Lightning",
+          "Psychic",
+          "Dragon",
+          "Darkness",
+          "Metal",
+          "Fighting",
+          "Fairy",
+          "Colorless",
+        ];
+
+        /* ─── STATE ──────────────────────────────── */
+        let allCards = [];
+        let filtered = [];
+        let activeType = "All";
+        let searchQ = "";
+        let currentPage = 1;
+        let totalCount = 0;
+        const currentUser = sessionStorage.getItem("loggedInUser");
+        let favorites = JSON.parse(localStorage.getItem("pkFavs_" + currentUser) || "[]");
+        let cardCache = JSON.parse(localStorage.getItem("pkCardCache") || "{}");
+
+        function saveFavs() {
+          const currentUser = sessionStorage.getItem("loggedInUser");
+          localStorage.setItem("pkFavs_" + currentUser, JSON.stringify(favorites));
+        }
+        function saveCache() {
+          localStorage.setItem("pkCardCache", JSON.stringify(cardCache));
+        }
+        function isFav(id) {
+          return favorites.includes(id);
+        }
+
+        /* ─── AJAX CALL (jQuery $.ajax) ─────────── */
+        /**
+         * fetchCards — RESTful GET request to Pokémon TCG API v2
+         * Uses jQuery $.ajax with:
+         *   - method: 'GET'
+         *   - dataType: 'json'
+         *   - data: query params (page, pageSize, orderBy, optional q filter)
+         *   - headers: optional API key
+         *   - success / error callbacks
+         */
+        function fetchCards(page) {
+          currentPage = page;
+
+          // If there is an active search query, route to search API instead
+          if (searchQ.trim()) {
+            fetchCardsWithSearch(searchQ.trim(), page);
+            return;
+          }
+
+          showSkeletons();
+          $("#apiStatus").text("Fetching…");
+
+          // Build query params — type filter only (no search)
+          var qParts = [];
+          if (activeType !== "All") qParts.push("types:" + activeType);
+
+          var params = { pageSize: PAGE_SIZE, page: page, orderBy: "name" };
+          if (qParts.length) params.q = qParts.join(" ");
+
+          var headers = {};
+          if (API_KEY) headers["X-Api-Key"] = API_KEY;
+
+          $.ajax({
+            url: API_BASE,
+            method: "GET",
+            dataType: "json",
+            data: params,
+            headers: headers,
+            success: function (res) {
+              allCards = res.data || [];
+              totalCount = res.totalCount || 0;
+              filtered = allCards;
+              $("#apiStatus").text(
+                "✓ " +
+                  totalCount.toLocaleString() +
+                  " total cards found via API",
+              );
+              $("#count-label").text(
+                "(showing " +
+                  filtered.length +
+                  " of " +
+                  totalCount.toLocaleString() +
+                  ")",
+              );
+              renderGrid();
+              updatePagination();
+            },
+            error: function (xhr, status, err) {
+              console.warn("API error:", status, err);
+              $("#apiStatus").text("⚠ CORS / rate-limit — showing demo cards");
+              useDemoCards();
+            },
+          });
+        }
+
+        /* ─── FALLBACK DEMO DATA ─────────────────── */
+        function useDemoCards() {
+          allCards = DEMO;
+          totalCount = DEMO.length;
+          applyLocalFilter();
+          updatePagination();
+        }
+
+        /* ─── SEARCH FILTER — calls API so it searches ALL cards, not just current page ──
+         * When user types, we build a new API query with name:* wildcard search
+         * This means page 4 water cards are found even if user is on page 1
+         */
+        function applyLocalFilter() {
+          // If search is empty, just show current allCards (fast, no extra API call)
+          const q = searchQ.trim();
+          if (!q) {
+            filtered = allCards;
+            $("#count-label").text(
+              "(showing " +
+                filtered.length +
+                " of " +
+                totalCount.toLocaleString() +
+                ")",
+            );
+            renderGrid();
+            return;
+          }
+          // Search query present — hit the API with name filter across ALL pages
+          fetchCardsWithSearch(q, 1);
+        }
+
+        /* ─── API SEARCH across all cards ─────────── */
+        function fetchCardsWithSearch(q, page) {
+          currentPage = page;
+          showSkeletons();
+          $("#apiStatus").text("Searching…");
+
+          // Build query: combine type filter + name search
+          var qParts = [];
+          if (activeType !== "All") qParts.push("types:" + activeType);
+          if (q) qParts.push("name:" + q + "*"); // wildcard: "ab*" matches Abomasnow, Absol etc.
+
+          var params = { pageSize: PAGE_SIZE, page: page, orderBy: "name" };
+          if (qParts.length) params.q = qParts.join(" ");
+
+          var headers = {};
+          if (API_KEY) headers["X-Api-Key"] = API_KEY;
+
+          $.ajax({
+            url: API_BASE,
+            method: "GET",
+            dataType: "json",
+            data: params,
+            headers: headers,
+            success: function (res) {
+              allCards = res.data || [];
+              totalCount = res.totalCount || 0;
+              filtered = allCards;
+              $("#apiStatus").text(
+                "✓ " + totalCount.toLocaleString() + " cards matched",
+              );
+              $("#count-label").text(
+                "(showing " +
+                  filtered.length +
+                  " of " +
+                  totalCount.toLocaleString() +
+                  ")",
+              );
+              renderGrid();
+              updatePagination();
+            },
+            error: function () {
+              // Fallback: local filter on current page data
+              filtered = allCards.filter(function (c) {
+                return (c.name || "").toLowerCase().includes(q.toLowerCase());
+              });
+              $("#count-label").text(
+                "(showing " + filtered.length + " — API search failed)",
+              );
+              renderGrid();
+            },
+          });
+        }
+
+        /* ─── SKELETON ───────────────────────────── */
+        function showSkeletons() {
+          var $g = $("#cardGrid").empty();
+          for (var i = 0; i < PAGE_SIZE; i++)
+            $g.append($("<div>").addClass("skeleton"));
+        }
+
+        /* ─── RENDER GRID ────────────────────────── */
+        function renderGrid() {
+          var $g = $("#cardGrid").empty();
+          if (!filtered.length) {
+            $g.append(
+              $("<div>")
+                .addClass("empty-state")
+                .html('<div class="big">🔍</div>No cards found.'),
+            );
+            return;
+          }
+          $.each(filtered, function (_, c) {
+            $g.append(buildCard(c));
+          });
+        }
+
+        /* ─── BUILD CARD ELEMENT ─────────────────── */
+        function buildCard(c) {
+          var type = (c.types && c.types[0]) || "Colorless";
+          var color = TYPE_COLOR[type] || "#888";
+          var glow = TYPE_GLOW[type] || "rgba(255,255,255,.2)";
+          var imgSrc = c.images?.small || "";
+          var hp = c.hp || "—";
+          var fav = isFav(c.id);
+
+          // stats
+          var hpNum = parseInt(hp) || 60;
+          var hpPct = Math.min(100, Math.round((hpNum / 340) * 100));
+          var atkDmg =
+            c.attacks && c.attacks[0]?.damage
+              ? parseInt(c.attacks[0].damage) || 20
+              : 20;
+          var atkPct = Math.min(100, Math.round((atkDmg / 300) * 100));
+          var spdPct = Math.floor(Math.random() * 45 + 35);
+
+          var $wrap = $("<div>")
+            .addClass("pcard")
+            .css({ "--tc": color, "--glow": glow });
+
+          /* front — real card image */
+          var $front = $("<div>")
+            .addClass("card-front")
+            .append(
+              $("<div>")
+                .addClass("card-img-wrap")
+                .append(
+                  $("<img>").attr({
+                    src: imgSrc,
+                    alt: c.name,
+                    loading: "lazy",
+                  }),
+                ),
+            );
+
+          /* back — stats */
+          var $back = $("<div>")
+            .addClass("card-back")
+            .css("--tc", color)
+            .html(
+              '<div class="back-ball"></div>' +
+                '<div class="back-name">' +
+                c.name +
+                "</div>" +
+                '<div class="back-type">' +
+                type +
+                "</div>" +
+                '<div class="back-stats">' +
+                statRow("HP", hp, hpPct) +
+                statRow("ATK", atkDmg, atkPct) +
+                statRow("SPD", spdPct, spdPct) +
+                "</div>" +
+                '<div class="back-set">' +
+                (c.set?.name || "") +
+                " · " +
+                (c.number || "") +
+                "</div>",
+            );
+
+          var $flipInner = $("<div>")
+            .addClass("card-flip-inner")
+            .append($front)
+            .append($back);
+
+          /* heart button */
+          var $heart = $("<button>")
+            .addClass("heart-btn")
+            .attr("aria-label", "Favorite")
+            .html(
+              '<span class="heart-icon ' +
+                (fav ? "on" : "off") +
+                '">' +
+                (fav ? "❤" : "🤍") +
+                "</span>",
+            );
+
+          $wrap.append($flipInner).append($heart);
+
+          /* events */
+          $wrap.on("click", function (e) {
+            if ($(e.target).closest(".heart-btn").length) return;
+            openModal(c);
+          });
+
+          $heart.on("click", function (e) {
+            e.stopPropagation();
+            var $icon = $(this).find(".heart-icon");
+            if (isFav(c.id)) {
+              favorites = favorites.filter(function (f) {
+                return f !== c.id;
+              });
+              $icon.removeClass("on").addClass("off").text("🤍");
+              showToast("Removed from Favorites");
+            } else {
+              favorites.push(c.id);
+              // cache full card data so favourite.html can load without extra API calls
+              cardCache[c.id] = c;
+              saveCache();
+              $icon.removeClass("off").addClass("on").text("❤");
+              showToast("Added to Favorites ♥");
+            }
+            saveFavs();
+            updateFavCount();
+          });
+
+          return $wrap;
+        }
+
+        function statRow(label, val, pct) {
+          return (
+            '<div class="back-stat-row">' +
+            '<span class="back-stat-label">' +
+            label +
+            "</span>" +
+            '<div class="back-stat-bar"><div class="back-stat-fill" style="width:' +
+            pct +
+            '%"></div></div>' +
+            '<span class="back-stat-val">' +
+            val +
+            "</span>" +
+            "</div>"
+          );
+        }
+
+        /* ─── MODAL ──────────────────────────────── */
+        function openModal(c) {
+          var type = (c.types && c.types[0]) || "Colorless";
+          var color = TYPE_COLOR[type] || "#888";
+          var imgLg = c.images?.large || c.images?.small || "";
+          var hp = c.hp || "—";
+          var shareText =
+            "Check out this Pokémon TCG card: " +
+            c.name +
+            " (" +
+            type +
+            " · " +
+            hp +
+            "HP) from " +
+            (c.set?.name || "Pokémon TCG") +
+            "!";
+          var shareURL = encodeURIComponent(window.location.href);
+          var shareMsg = encodeURIComponent(shareText);
+
+          $("#modalImg").attr({ src: imgLg, alt: c.name });
+          $("#modalOverlay").css("--tc", color);
+
+          /* big card back */
+          var hpNum = parseInt(hp) || 60;
+          var hpPct = Math.min(100, Math.round((hpNum / 340) * 100));
+          var atkDmg =
+            c.attacks && c.attacks[0]?.damage
+              ? parseInt(c.attacks[0].damage) || 20
+              : 20;
+          var atkPct = Math.min(100, Math.round((atkDmg / 300) * 100));
+          var spdPct = Math.floor(Math.random() * 45 + 35);
+
+          $("#modalBack")
+            .css("--tc", color)
+            .html(
+              '<div style="position:absolute;inset:0;background:linear-gradient(145deg,#1a1040,#2d1b6e,#1a1040);border:2px solid rgba(255,215,0,.45);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;overflow:hidden;">' +
+                '<div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,215,0,.07),transparent 55%),repeating-linear-gradient(45deg,rgba(255,255,255,.02) 0,rgba(255,255,255,.02) 1px,transparent 1px,transparent 14px);border-radius:14px;"></div>' +
+                '<div style="width:72px;height:72px;border-radius:50%;background:conic-gradient(#e53935 0deg 180deg,#fff 180deg 360deg);border:4px solid #fff;position:relative;flex-shrink:0;box-shadow:0 0 24px rgba(255,215,0,.3);z-index:1;"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #333;"></div></div>' +
+                "<div style=\"font-family:'Cinzel Decorative',serif;font-size:.9rem;font-weight:700;color:#ffd700;text-align:center;z-index:1;\">" +
+                c.name +
+                "</div>" +
+                '<div style="font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 12px;border-radius:999px;background:' +
+                color +
+                ';color:#fff;z-index:1;">' +
+                type +
+                "</div>" +
+                '<div style="display:flex;flex-direction:column;gap:5px;width:100%;z-index:1;">' +
+                bigStatRow("HP", hp, hpPct, color) +
+                bigStatRow("ATK", atkDmg, atkPct, color) +
+                bigStatRow("SPD", spdPct, spdPct, color) +
+                "</div>" +
+                (c.attacks
+                  ? '<div style="font-size:.52rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);align-self:flex-start;z-index:1;">Attacks</div>' +
+                    '<div style="display:flex;flex-direction:column;gap:5px;width:100%;z-index:1;">' +
+                    c.attacks
+                      .map(function (a) {
+                        return (
+                          '<div style="display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.3);border-radius:7px;padding:6px 9px;border-left:3px solid ' +
+                          color +
+                          ';"><span style="font-size:.6rem;font-weight:700;color:rgba(255,255,255,.85);flex:1;">' +
+                          a.name +
+                          '</span><span style="font-size:.68rem;font-weight:800;color:#ffd700;">' +
+                          (a.damage || "—") +
+                          "</span></div>"
+                        );
+                      })
+                      .join("") +
+                    "</div>"
+                  : "") +
+                "</div>",
+            );
+
+          /* right panel */
+          var $info = $("#modalInfo").empty();
+          $info.append($("<div>").addClass("modal-name").text(c.name));
+
+          var $meta = $("<div>").addClass("modal-meta");
+          $meta.append(
+            $("<span>")
+              .addClass("meta-tag tag-type")
+              .css("background", color)
+              .text(type),
+          );
+          if (hp !== "—")
+            $meta.append(
+              $("<span>")
+                .addClass("meta-tag tag-hp")
+                .text(hp + " HP"),
+            );
+          if (c.rarity)
+            $meta.append(
+              $("<span>").addClass("meta-tag tag-rarity").text(c.rarity),
+            );
+          if (c.set?.name)
+            $meta.append(
+              $("<span>").addClass("meta-tag tag-set").text(c.set.name),
+            );
+          $info.append($meta);
+
+          if (c.attacks && c.attacks.length) {
+            $info.append(
+              $("<div>").addClass("modal-section-title").text("Attacks"),
+            );
+            var $atks = $("<div>").addClass("modal-attacks");
+            $.each(c.attacks, function (_, a) {
+              var $row = $("<div>").addClass("attack-row");
+              var $cost = $("<div>").addClass("attack-cost");
+              if (a.cost)
+                $.each(a.cost, function () {
+                  $cost.append($("<div>").addClass("cost-icon").text("●"));
+                });
+              var $nw = $("<div>")
+                .css("flex", "1")
+                .append($("<div>").addClass("attack-name").text(a.name));
+              if (a.text)
+                $nw.append($("<div>").addClass("attack-text").text(a.text));
+              $row
+                .append($cost)
+                .append($nw)
+                .append(
+                  $("<div>")
+                    .addClass("attack-dmg")
+                    .text(a.damage || "—"),
+                );
+              $atks.append($row);
+            });
+            $info.append($atks);
+          }
+
+          if (c.weaknesses && c.weaknesses.length) {
+            $info.append(
+              $("<div>").addClass("modal-section-title").text("Weakness"),
+            );
+            var $wk = $("<div>").addClass("modal-weaknesses");
+            $.each(c.weaknesses, function (_, w) {
+              var wc = TYPE_COLOR[w.type] || "#888";
+              $wk.append(
+                $("<span>")
+                  .addClass("weak-tag")
+                  .css({
+                    background: wc + "33",
+                    border: "1px solid " + wc + "66",
+                    color: wc,
+                  })
+                  .text(w.type + " " + w.value),
+              );
+            });
+            $info.append($wk);
+          }
+
+          /* ── SOCIAL SHARE (jQuery) ── */
+          var $share = $("<div>").addClass("share-section");
+          $share.append(
+            $("<div>").addClass("share-label").text("Share This Card"),
+          );
+          var $btns = $("<div>").addClass("share-btns");
+
+          // Facebook Share plugin
+          $btns.append(
+            $("<a>")
+              .addClass("share-btn btn-facebook")
+              .attr({
+                href:
+                  "https://www.facebook.com/sharer/sharer.php?u=" +
+                  shareURL +
+                  "&quote=" +
+                  shareMsg,
+                target: "_blank",
+                rel: "noopener",
+              })
+              .html('<i class="fa-brands fa-facebook-f"></i> Facebook'),
+          );
+          // X (Twitter) Web Intent
+          $btns.append(
+            $("<a>")
+              .addClass("share-btn btn-twitter")
+              .attr({
+                href:
+                  "https://twitter.com/intent/tweet?text=" +
+                  shareMsg +
+                  "&url=" +
+                  shareURL,
+                target: "_blank",
+                rel: "noopener",
+              })
+              .html('<i class="fa-brands fa-x-twitter"></i> X / Twitter'),
+          );
+          // WhatsApp Share API
+          $btns.append(
+            $("<a>")
+              .addClass("share-btn btn-whatsapp")
+              .attr({
+                href: "https://wa.me/?text=" + shareMsg + "%20" + shareURL,
+                target: "_blank",
+                rel: "noopener",
+              })
+              .html('<i class="fa-brands fa-whatsapp"></i> WhatsApp'),
+          );
+          // Copy link button
+          var $copy = $("<button>")
+            .addClass("share-btn btn-copy")
+            .html('<i class="fa-regular fa-copy"></i> Copy Link');
+          $copy.on("click", function () {
+            navigator.clipboard
+              .writeText(shareText + " " + window.location.href)
+              .then(function () {
+                $copy
+                  .addClass("copied")
+                  .html('<i class="fa-solid fa-check"></i> Copied!');
+                setTimeout(function () {
+                  $copy
+                    .removeClass("copied")
+                    .html('<i class="fa-regular fa-copy"></i> Copy Link');
+                }, 2200);
+              });
+          });
+          $btns.append($copy);
+          $share.append($btns);
+          $info.append($share);
+
+          $("#modalOverlay").removeClass("show-back").addClass("open");
+        }
+
+        function bigStatRow(l, v, p, color) {
+          return (
+            '<div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border-radius:7px;padding:5px 8px;">' +
+            '<span style="font-size:.52rem;color:rgba(255,255,255,.5);font-weight:700;text-transform:uppercase;width:26px;">' +
+            l +
+            "</span>" +
+            '<div style="flex:1;height:5px;background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden;"><div style="height:100%;width:' +
+            p +
+            "%;border-radius:999px;background:linear-gradient(90deg," +
+            color +
+            ',#ffd700);"></div></div>' +
+            '<span style="font-size:.58rem;font-weight:800;color:#ffd700;width:24px;text-align:right;">' +
+            v +
+            "</span>" +
+            "</div>"
+          );
+        }
+
+        function closeModal() {
+          $("#modalOverlay").removeClass("open");
+          setTimeout(function () {
+            $("#modalOverlay").removeClass("show-back");
+          }, 300);
+        }
+
+        $("#modalFlip").on("click", function () {
+          $("#modalOverlay").toggleClass("show-back");
+        });
+        $("#modalClose").on("click", function (e) {
+          e.stopPropagation();
+          closeModal();
+        });
+        $("#modalOverlay").on("click", function (e) {
+          if ($(e.target).is("#modalOverlay")) closeModal();
+        });
+        $(document).on("keydown", function (e) {
+          if (e.key === "Escape") closeModal();
+        });
+
+        /* ─── FILTER BAR ─────────────────────────── */
+        $.each(TYPE_PILLS, function (_, t) {
+          var color = TYPE_COLOR[t] || "#fff";
+          var $p = $("<button>")
+            .addClass("pill" + (t === "All" ? " active" : ""))
+            .text(t);
+          if (t !== "All")
+            $p.css({ "--pill-color": color, "--pill-bg": color + "33" });
+          $p.on("click", function () {
+            $(".pill").removeClass("active");
+            $p.addClass("active");
+            activeType = t;
+            searchQ = ""; // clear search when switching type
+            $("#searchInput").val("");
+            fetchCards(1);
+          });
+          $("#filterBar").append($p);
+        });
+
+        /* ─── SEARCH (debounced) — calls API directly so it searches ALL pages ─── */
+        var searchTimer;
+        $("#searchInput").on("input", function () {
+          clearTimeout(searchTimer);
+          var val = $(this).val();
+          searchTimer = setTimeout(function () {
+            searchQ = val;
+            fetchCards(1); // fetchCards routes to fetchCardsWithSearch when searchQ is set
+          }, 450);
+        });
+
+        /* ─── PAGINATION ─────────────────────────── */
+        function updatePagination() {
+          var total = Math.ceil(totalCount / PAGE_SIZE) || 1;
+          $("#page-label").text("Page " + currentPage + " / " + total);
+          $("#prevBtn").prop("disabled", currentPage <= 1);
+          $("#nextBtn").prop("disabled", currentPage >= total);
+        }
+        $("#prevBtn").on("click", function () {
+          if (currentPage > 1) {
+            fetchCards(currentPage - 1);
+            $("html,body").animate({ scrollTop: 0 }, 280);
+          }
+        });
+        $("#nextBtn").on("click", function () {
+          fetchCards(currentPage + 1);
+          $("html,body").animate({ scrollTop: 0 }, 280);
+        });
+
+        /* ─── HELPERS ────────────────────────────── */
+        function updateFavCount() {
+          $("#favCount").text(favorites.length);
+        }
+        var toastTimer;
+        function showToast(msg) {
+          clearTimeout(toastTimer);
+          $("#toast").text(msg).addClass("show");
+          toastTimer = setTimeout(function () {
+            $("#toast").removeClass("show");
+          }, 2000);
+        }
+
+        /* ─── DEMO FALLBACK DATA ─────────────────── */
+        var DEMO = [
+          {
+            id: "base1-4",
+            name: "Charizard",
+            types: ["Fire"],
+            hp: "120",
+            rarity: "Holo Rare",
+            set: { name: "Base Set" },
+            number: "4/102",
+            images: {
+              small: "https://images.pokemontcg.io/base1/4.png",
+              large: "https://images.pokemontcg.io/base1/4_hires.png",
+            },
+            attacks: [
+              {
+                name: "Fire Spin",
+                damage: "100",
+                cost: ["Fire", "Fire", "Fire", "Fire"],
+                text: "Discard 2 Energy cards attached to Charizard in order to use this attack.",
+              },
+            ],
+            weaknesses: [{ type: "Water", value: "×2" }],
+          },
+          {
+            id: "base1-2",
+            name: "Blastoise",
+            types: ["Water"],
+            hp: "100",
+            rarity: "Holo Rare",
+            set: { name: "Base Set" },
+            number: "2/102",
+            images: {
+              small: "https://images.pokemontcg.io/base1/2.png",
+              large: "https://images.pokemontcg.io/base1/2_hires.png",
+            },
+            attacks: [
+              {
+                name: "Hydro Pump",
+                damage: "40+",
+                cost: ["Water", "Water", "Water"],
+                text: "Does 40 damage + 10 more damage for each Water Energy attached.",
+              },
+            ],
+            weaknesses: [{ type: "Lightning", value: "×2" }],
+          },
+          {
+            id: "base1-15",
+            name: "Venusaur",
+            types: ["Grass"],
+            hp: "100",
+            rarity: "Holo Rare",
+            set: { name: "Base Set" },
+            number: "15/102",
+            images: {
+              small: "https://images.pokemontcg.io/base1/15.png",
+              large: "https://images.pokemontcg.io/base1/15_hires.png",
+            },
+            attacks: [
+              {
+                name: "Solar Beam",
+                damage: "60",
+                cost: ["Grass", "Grass", "Grass", "Grass"],
+              },
+            ],
+            weaknesses: [{ type: "Fire", value: "×2" }],
+          },
+          {
+            id: "base1-58",
+            name: "Pikachu",
+            types: ["Lightning"],
+            hp: "40",
+            rarity: "Common",
+            set: { name: "Base Set" },
+            number: "58/102",
+            images: {
+              small: "https://images.pokemontcg.io/base1/58.png",
+              large: "https://images.pokemontcg.io/base1/58_hires.png",
+            },
+            attacks: [
+              {
+                name: "Thunder Shock",
+                damage: "20",
+                cost: ["Lightning"],
+                text: "Flip a coin. If heads, the Defending Pokémon is now Paralyzed.",
+              },
+            ],
+            weaknesses: [{ type: "Fighting", value: "×2" }],
+          },
+          {
+            id: "base1-10",
+            name: "Mewtwo",
+            types: ["Psychic"],
+            hp: "60",
+            rarity: "Holo Rare",
+            set: { name: "Base Set" },
+            number: "10/102",
+            images: {
+              small: "https://images.pokemontcg.io/base1/10.png",
+              large: "https://images.pokemontcg.io/base1/10_hires.png",
+            },
+            attacks: [
+              { name: "Psyburn", damage: "30", cost: ["Psychic", "Psychic"] },
+            ],
+            weaknesses: [{ type: "Darkness", value: "×2" }],
+          },
+          {
+            id: "base1-6",
+            name: "Gyarados",
+            types: ["Water"],
+            hp: "100",
+            rarity: "Holo Rare",
+            set: { name: "Base Set" },
+            number: "6/102",
+            images: {
+              small: "https://images.pokemontcg.io/base1/6.png",
+              large: "https://images.pokemontcg.io/base1/6_hires.png",
+            },
+            attacks: [
+              {
+                name: "Dragon Rage",
+                damage: "50",
+                cost: ["Water", "Water", "Water"],
+              },
+            ],
+            weaknesses: [{ type: "Grass", value: "×2" }],
+          },
+          {
+            id: "base1-16",
+            name: "Zapdos",
+            types: ["Lightning"],
+            hp: "90",
+            rarity: "Holo Rare",
+            set: { name: "Base Set" },
+            number: "16/102",
+            images: {
+              small: "https://images.pokemontcg.io/base1/16.png",
+              large: "https://images.pokemontcg.io/base1/16_hires.png",
+            },
+            attacks: [
+              {
+                name: "Thunder",
+                damage: "60",
+                cost: ["Lightning", "Lightning", "Lightning"],
+              },
+            ],
+            weaknesses: [{ type: "Fighting", value: "×2" }],
+          },
+          {
+            id: "base1-5",
+            name: "Clefairy",
+            types: ["Colorless"],
+            hp: "40",
+            rarity: "Holo Rare",
+            set: { name: "Base Set" },
+            number: "5/102",
+            images: {
+              small: "https://images.pokemontcg.io/base1/5.png",
+              large: "https://images.pokemontcg.io/base1/5_hires.png",
+            },
+            attacks: [
+              {
+                name: "Metronome",
+                damage: "",
+                cost: ["Colorless"],
+                text: "Choose 1 of the Defending Pokémon's attacks. Metronome copies that attack.",
+              },
+            ],
+            weaknesses: [{ type: "Fighting", value: "×2" }],
+          },
+          {
+            id: "base1-9",
+            name: "Magneton",
+            types: ["Lightning"],
+            hp: "60",
+            rarity: "Holo Rare",
+            set: { name: "Base Set" },
+            number: "9/102",
+            images: {
+              small: "https://images.pokemontcg.io/base1/9.png",
+              large: "https://images.pokemontcg.io/base1/9_hires.png",
+            },
+            attacks: [
+              {
+                name: "Selfdestruct",
+                damage: "80",
+                cost: ["Lightning", "Lightning", "Lightning"],
+                text: "Does 20 damage to each Pokémon on each player's Bench.",
+              },
+            ],
+            weaknesses: [{ type: "Fighting", value: "×2" }],
+          },
+          {
+            id: "base1-13",
+            name: "Venomoth",
+            types: ["Grass"],
+            hp: "70",
+            rarity: "Holo Rare",
+            set: { name: "Base Set" },
+            number: "13/102",
+            images: {
+              small: "https://images.pokemontcg.io/base1/13.png",
+              large: "https://images.pokemontcg.io/base1/13_hires.png",
+            },
+            attacks: [{ name: "Confuse Ray", damage: "10", cost: ["Grass"] }],
+            weaknesses: [{ type: "Fire", value: "×2" }],
+          },
+        ];
+
+        /* ─── INIT ───────────────────────────────── */
+        updateFavCount();
+        fetchCards(1);
+      }); // end document ready
+    </script>
+    <script src="main.js"></script>
+  </body>
+</html>

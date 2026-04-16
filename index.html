@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="images/x-icon" href="images/logo.png">
+        <title>Pokémon TCG Home</title>
+        <link rel="stylesheet" href="home.css">
+    </head>
+    
+    <body>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+        src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v19.0"></script>
+
+        <nav class="navbar" id="navbar"></nav>
+        
+        <div class="slider">
+            <div class="slides">
+                <img src="images/slider1.jpg" alt="Slider 1">
+                <img src="images/slider2.jpg" alt="Slider 2">
+                <img src="images/slider3.jpg" alt="Slider 3">
+            </div>
+            
+            <!-- Arrows -->
+            <button class="prev">&#10094;</button>
+            <button class="next">&#10095;</button>
+            
+            <div class="dots">
+                <span class="dot active" onclick="goToSlide(0)"></span>
+                <span class="dot" onclick="goToSlide(1)"></span>
+                <span class="dot" onclick="goToSlide(2)"></span>
+            </div>
+        </div>
+        
+        <script src="main.js"></script>
+        
+        <script>
+        const slides = document.querySelector(".slides");
+        const slideImages = document.querySelectorAll(".slides img");
+        const dots = document.querySelectorAll(".dot");
+        const totalSlides = slideImages.length;
+
+        let index = 0;
+        let slideInterval;
+
+        function updateSlider() {
+            slides.style.transform = `translateX(-${index * 100}%)`;
+
+            dots.forEach(dot => dot.classList.remove("active"));
+            dots[index].classList.add("active");
+        }
+
+        function nextSlide() {
+            index = (index + 1) % totalSlides;
+            updateSlider();
+        }
+
+        function prevSlide() {
+            index = (index - 1 + totalSlides) % totalSlides;
+            updateSlider();
+        }
+
+        function goToSlide(i) {
+            index = i;
+            updateSlider();
+        }
+
+        document.querySelector(".next").addEventListener("click", nextSlide);
+        document.querySelector(".prev").addEventListener("click", prevSlide);
+
+        function startAutoSlide() {
+            slideInterval = setInterval(nextSlide, 3000);
+        }
+
+        function stopAutoSlide() {
+            clearInterval(slideInterval);
+        }
+
+        startAutoSlide();
+
+        const sliderContainer = document.querySelector(".slider");
+        sliderContainer.addEventListener("mouseenter", stopAutoSlide);
+        sliderContainer.addEventListener("mouseleave", startAutoSlide);
+        </script>
+        
+        <!-- ================= FEATURE 1 ================= -->
+        <section class="feature1-section">
+            <div class="feature1-container">
+                
+                <!-- Left: Text Content -->
+                <div class="feature1-content">
+                    <h1>Pokémon Trading Card Game</h1>
+                    <p>
+                        The Pokémon Trading Card Game (TCG) is a strategic card game where players become trainers and battle using Pokémon, 
+                        Trainer and Energy cards. It combines skill, strategy and fun for players of all ages.
+                    </p>
+                    
+                    <a href="about.html" class="feature1-btn">Learn More</a>
+                </div>
+                
+                <!-- Right: Image -->
+                <div class="feature1-image">
+                    <img src="images/image1.jpg" alt="Image 1">
+                </div>
+            </div>
+        </section>
+        
+        <!-- ===== FEATURE 2 (Reverse Layout) ===== -->
+        <section class="feature2-section">
+            <div class="feature2-container reverse">
+                <div class="feature2-image">
+                    <img src="images/image2.webp" alt="Image 2">
+                </div>
+                
+                <div class="feature2-content">
+                    <h1>Discover Your Pokémon Collection!</h1>
+                    <p>
+                        Explore every Pokémon card and keep your favorites close! 
+                        Log in to enjoy your personal card gallery!
+                    </p>
+                    <a href="login.html" class="feature2-btn">Log In Now</a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- ===== FEATURE 3 ===== -->
+        <section class="feature3-section">
+            <div class="feature3-container">
+                
+                <!-- Left: Text Content -->
+                <div class="feature3-content">
+                    <h1>New to the Game?</h1>
+                    <p>
+                        Don't worry! Start your Pokémon journey here! 
+                        Explore helpful guides, simple tutorials, and easy tips to learn the rules and begin your journey with confidence!
+                    </p>
+                    
+                    <a href="beginner.html" class="feature3-btn">Explore Now</a>
+                </div>
+                
+                <!-- Right: Image -->
+                <div class="feature3-image">
+                    <img src="images/image3.webp" alt="Image 3">
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FEATURE 4 (Reverse Layout) ===== -->
+        <section class="feature4-section">
+            <div class="feature4-container reverse">
+                <div class="feature4-image">
+                    <img src="images/image4.jpg" alt="Image 4">
+                </div>
+                
+                <div class="feature4-content">
+                    <h1>How to Build a Strong Deck</h1>
+                    <p>
+                        Not sure how to build your deck? 
+                        Our deck guide shows you how to choose the right cards and create a strong setup for your Pokémon battles.
+                    </p>
+                    <a href="decks.html" class="feature4-btn">Start Deck Guide</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SOCIAL & NEWS SECTION ===== -->
+        <section class="social-news-section">
+            <h2>Stay Connected & Check Out the Latest News</h2>
+            
+            <!-- Facebook News -->
+            <div class="facebook-news">
+                <a href="https://www.facebook.com/Pokemon.TCG.Official.Asia.ENG" target="_blank" class="facebook-link">
+                    <img src="images/facebook.webp" alt="Facebook">
+                </a>
+                
+                <div class="facebook-container">
+                    <div class="fb-page"
+                    data-href="https://www.facebook.com/Pokemon.TCG.Official.Asia.ENG"
+                    data-tabs="timeline"
+                    data-width="500"
+                    data-height="500"
+                    data-small-header="false"
+                    data-adapt-container-width="true"
+                    data-hide-cover="false"
+                    data-show-facepile="true"></div>
+                </div>
+            </div>
+            
+            <!-- Related Links -->
+            <div class="related-links">
+                <h3>Related Links</h3>
+                
+                <div class="related-container">
+                    <a href="https://www.youtube.com/user/Pokemon" target="_blank" class="related-btn">
+                        <div class="related-left">
+                            <img src="images/Youtube.webp" alt="YouTube">
+                            <span>YouTube</span>
+                        </div>
+                    </a>
+                    
+                    <a href="https://www.instagram.com/pokemon" target="_blank" class="related-btn">
+                        <div class="related-left">
+                            <img src="images/Instagram.png" alt="Instagram">
+                            <span>Instagram</span>
+                        </div>
+                    </a>
+                    
+                    <a href="https://www.pokemon.com/us/pokemon-tcg" target="_blank" class="related-btn">
+                        <div class="related-left">
+                            <img src="images/logo2.png" alt="Pokemon">
+                            <span>The Official Pokémon Site</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>

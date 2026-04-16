@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon TCG Tutorial</title>
+    <link rel="icon" type="images/x-icon" href="images/logo.png">
+    <link rel="stylesheet" href="home.css">
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+            background-color: #f0f2f5;
+            color: #222;
+            margin: 0;
+            padding-top: 50px;
+        }
+
+        header {
+            background-color: #cc0000;
+            color: white;
+            padding: 30px 20px 20px;
+            border-bottom: 4px solid #ffde00;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+            font-size: 32px;
+        }
+
+        header p {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .local-nav {
+            background-color: #222;
+            padding: 12px 10px;
+            top: 60px;
+            z-index: 999;
+            text-align: center;
+        }
+
+        .local-nav a {
+            color: white;
+            margin: 0 12px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .local-nav a:hover {
+            color: #ffde00;
+        }
+
+        .section {
+            margin: 40px auto;
+            max-width: 850px;
+            background-color: white;
+            border-radius: 16px;
+            padding: 30px 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        .section h2 {
+            text-align: center;
+            color: #000000;
+            margin: 0 auto 15px;
+            font-size: 28px;
+            font-weight: bold;
+            background: #ff8e8e;
+            padding: 12px 30px;
+            border-radius: 40px;
+            border: 1px solid #d98c8c;
+            display: inline-block;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .title-underline {
+            border: none;
+            border-top: 3.5px dashed #f7c23c;
+            width: 90%;
+            margin: 5px auto 25px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px auto;
+            background-color: #ffffff;
+        }
+
+        th {
+            background-color: #79befa;
+            color: #1a3a5c;
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: bold;
+            border: 2px solid #3980ba;
+        }
+
+        td {
+            padding: 10px 14px;
+            border: 2px solid #ccc;
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        /* 视频容器：响应式 16:9 嵌入框，圆角卡片效果 */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 560px;
+            /* 控制最大宽度，居中显示 */
+            margin: 20px auto 0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            border: 1px solid #444;
+        }
+
+        .video-wrapper iframe {
+            display: block;
+            width: 100%;
+            height: 315px;
+            /* 16:9 标准高度 (560x315) */
+            border: none;
+        }
+
+        .tips-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .tip-card {
+            background-color: #fff9e6;
+            border: 1px solid #ffe082;
+            border-radius: 16px;
+            padding: 16px 14px;
+            width: 200px;
+            text-align: left;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .tip-card h3 {
+            margin: 0 0 8px;
+            font-size: 15px;
+            color: #b45f06;
+            border-bottom: 1px dashed #dba;
+            padding-bottom: 5px;
+        }
+
+        .tip-card p {
+            margin: 0;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .win-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .win-card {
+            background-color: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            border-radius: 20px;
+            padding: 20px 14px;
+            width: 210px;
+            text-align: center;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .win-card .icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .win-card h3 {
+            margin: 0 0 8px;
+            font-size: 15px;
+            color: #2e7d32;
+        }
+
+        .win-card p {
+            margin: 0;
+            font-size: 13px;
+            color: #1e2e1e;
+        }
+
+        ol {
+            padding-left: 25px;
+        }
+
+        ol li {
+            margin-bottom: 10px;
+        }
+
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #b0bec5, #90a4ae, #b0bec5, transparent);
+            margin: 20px 0;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        footer {
+            background-color: #263238;
+            color: #cfd8dc;
+            padding: 25px 20px;
+            font-size: 14px;
+            margin-top: 40px;
+            border-top: 5px solid #cc0000;
+        }
+
+        footer a {
+            color: #ffb3b3;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            color: #ffde00;
+        }
+
+        .go-top {
+            display: inline-block;
+            margin-top: 12px;
+            background: #455a64;
+            color: white;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 14px;
+            text-decoration: none;
+            border: 1px solid #cc0000;
+        }
+
+        .go-top:hover {
+            background: #cc0000;
+        }
+
+        @media (max-width: 600px) {
+            .section {
+                padding: 20px 15px;
+            }
+
+            header h1 {
+                font-size: 26px;
+            }
+
+            .local-nav a {
+                margin: 0 6px;
+                font-size: 13px;
+            }
+
+            .section h2 {
+                font-size: 24px;
+            }
+
+            .video-wrapper iframe {
+                height: 240px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar" id="navbar"></nav>
+
+    <header>
+        <h1>⚡ Pokémon Trading Card Game Tutorial ⚡</h1>
+        <p>A beginner's guide to understanding and playing the Pokémon TCG.</p>
+    </header>
+
+    <nav class="local-nav">
+        <a href="#intro">Introduction</a>
+        <a href="#types">Types of Cards</a>
+        <a href="#setup">Game Setup</a>
+        <a href="#steps">Basic Steps</a>
+        <a href="#win">How to Win</a>
+        <a href="#tips">Tips</a>
+    </nav>
+
+    <hr>
+
+    <!-- Introduction -->
+    <div class="section" id="intro">
+        <h2>Introduction</h2>
+        <div class="title-underline"></div>
+        <p>The <strong>Pokémon Trading Card Game (TCG)</strong> is a two-player strategic card game where players build
+            a deck of 60 cards and battle using Pokémon. Players take turns drawing cards, playing Pokémon onto the
+            field, attaching Energy cards to power up attacks, and using Trainer cards for support. The goal is to knock
+            out your opponent's Pokémon and collect all 6 Prize Cards before they collect yours.</p>
+        <p>Watch a quick introduction:</p>
+        <!-- 嵌入 YouTube 视频，自动显示封面，无多余文字 -->
+        <div class="video-wrapper">
+            <video controls width="100%">
+                <source src="videos/intro.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Types of Cards -->
+    <div class="section" id="types">
+        <h2>Types of Cards</h2>
+        <div class="title-underline"></div>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Role</th>
+                <th>Key Subtypes</th>
+                <th>Deck Limit</th>
+            </tr>
+            <tr>
+                <td><strong>Pokémon</strong></td>
+                <td>Attack and defend. The core of every battle.</td>
+                <td>Basic, Stage 1, Stage 2, ex, V, VMAX, VSTAR, Tera ex, Radiant, Ancient / Future</td>
+                <td>Max 4 copies of the same name</td>
+            </tr>
+            <tr>
+                <td><strong>Trainer</strong></td>
+                <td>Support your strategy. Search cards, heal Pokémon, or control the field.</td>
+                <td>Item (unlimited/turn), Tool (attach to Pokémon), Supporter (1/turn), Stadium (affects both sides),
+                    ACE SPEC (1 per deck)</td>
+                <td>Max 4 copies (ACE SPEC: max 1 per deck)</td>
+            </tr>
+            <tr>
+                <td><strong>Energy</strong></td>
+                <td>Power Pokémon moves. Must be attached to attack.</td>
+                <td>Basic Energy (9 types: Grass, Fire, Water, Lightning, Psychic, Fighting, Darkness, Metal,
+                    Colorless), Special Energy (bonus effects)</td>
+                <td>Basic Energy: unlimited. Special Energy: max 4</td>
+            </tr>
+        </table>
+        <p>Watch a card types explanation:</p>
+        <div class="video-wrapper">
+            <video controls width="100%">
+                <source src="videos/type.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Game Setup -->
+    <div class="section" id="setup">
+        <h2>Game Setup</h2>
+        <div class="title-underline"></div>
+        <ol>
+            <li>Each player must have a deck of exactly <strong>60 cards</strong>.</li>
+            <li>Both players shuffle their own decks. Either player may also shuffle the opponent's deck.</li>
+            <li>Flip a coin or roll a die to decide who goes first.</li>
+            <li>Each player draws <strong>7 cards</strong> as their starting hand.</li>
+            <li>If you have <strong>no Basic Pokémon</strong> in your hand, reveal your hand, shuffle it back, and
+                redraw. This is called a <em>mulligan</em>. Your opponent may draw 1 extra card each time you mulligan.
+            </li>
+            <li>Place <strong>1 Basic Pokémon face-down</strong> as your Active Pokémon.</li>
+            <li>Place <strong>up to 5 more Basic Pokémon</strong> face-down on your Bench.</li>
+            <li>Each player sets the <strong>top 6 cards</strong> of their deck face-down as <strong>Prize
+                    Cards</strong>.</li>
+            <li>Flip all Pokémon face-up at the same time. The game begins!</li>
+        </ol>
+        <p><em>Note: The first player does NOT draw a card on their first turn.</em></p>
+    </div>
+
+    <hr>
+
+    <!-- Basic Steps -->
+    <div class="section" id="steps">
+        <h2>Basic Steps (Each Turn)</h2>
+        <div class="title-underline"></div>
+        <ol>
+            <li><strong>Draw a card</strong> from the top of your deck.</li>
+            <li><strong>Play Basic Pokémon</strong> from your hand onto your Bench (optional).</li>
+            <li><strong>Evolve Pokémon</strong> that have been in play since your last turn (optional).</li>
+            <li><strong>Attach 1 Energy card</strong> from your hand to any of your Pokémon (once per turn).</li>
+            <li><strong>Play Trainer cards</strong>: use Item cards freely, play 1 Supporter card, or play a Stadium
+                card (optional).</li>
+            <li><strong>Retreat your Active Pokémon</strong> by paying its Retreat Cost (optional, once per turn).</li>
+            <li><strong>Attack</strong> using your Active Pokémon. This ends your turn.</li>
+        </ol>
+        <p><em>Note: Steps 2–6 can be done in any order. Attacking always ends your turn.</em></p>
+        <p>Watch a gameplay tutorial:</p>
+        <div class="video-wrapper">
+            <video controls width="100%">
+                <source src="videos/step.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- How to Win -->
+    <div class="section" id="win">
+        <h2>How to Win</h2>
+        <div class="title-underline"></div>
+        <p>A player wins by achieving <strong>any one</strong> of the following:</p>
+        <div class="win-grid">
+            <div class="win-card">
+                <div class="icon">🏆</div>
+                <h3>Collect all 6 Prize Cards</h3>
+                <p>Take a Prize Card each time you knock out an opponent's Pokémon. Special rule Pokémon (ex, V) give 2
+                    Prize Cards when knocked out.</p>
+            </div>
+            <div class="win-card">
+                <div class="icon">❌</div>
+                <h3>Opponent has no Pokémon left</h3>
+                <p>If your opponent has no Active Pokémon and no Pokémon on the Bench, you win immediately.</p>
+            </div>
+            <div class="win-card">
+                <div class="icon">📄</div>
+                <h3>Opponent cannot draw a card</h3>
+                <p>If your opponent's deck is empty and they cannot draw at the start of their turn, you win.</p>
+            </div>
+        </div>
+        <br>
+        <p>Watch an explanation of win conditions:</p>
+        <div class="video-wrapper">
+            <video controls width="100%">
+                <source src="videos/win.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Tips -->
+    <div class="section" id="tips">
+        <h2>Tips for Beginners</h2>
+        <div class="title-underline"></div>
+        <div class="tips-grid">
+            <div class="tip-card">
+                <h3>🪙 Start with a Theme Deck</h3>
+                <p>Pre-built decks are balanced and ready to play — perfect for learning the basics.</p>
+            </div>
+            <div class="tip-card">
+                <h3>⚡ Balance Your Energy</h3>
+                <p>Aim for 12–15 Basic Energy cards in your 60-card deck to avoid running out mid-game.</p>
+            </div>
+            <div class="tip-card">
+                <h3>📘 Use Supporter Cards</h3>
+                <p>Cards like Professor's Research let you draw 7 new cards. Use them when your hand is low.</p>
+            </div>
+            <div class="tip-card">
+                <h3>🏆 Track Prize Cards</h3>
+                <p>Always keep count of both players' Prize Cards. Knowing who is close to winning changes your
+                    strategy.</p>
+            </div>
+            <div class="tip-card">
+                <h3>🔥 Use Type Advantage</h3>
+                <p>Weakness doubles damage. If the opponent's Pokémon is weak to your type, prioritize those attacks.
+                </p>
+            </div>
+            <div class="tip-card">
+                <h3>💪 Bench Carefully</h3>
+                <p>Don't bench Pokémon you don't need — some attacks hit the Bench, and a knocked-out Benched Pokémon
+                    still gives a Prize Card.</p>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <footer>
+        <p><a href="decks.html">▶ Go to Deck Guide</a></p>
+        <p style="margin-top: 10px;">Pokémon TCG Tutorial — Beginner's Guide</p>
+        <a href="#" class="go-top">↑ Back to top</a>
+        <p style="margin-top: 14px; opacity: 0.8;">⚪ ⚫ ⚪ Gotta learn 'em all!</p>
+    </footer>
+
+    <script>
+        (function () {
+            var nav = document.querySelector('.local-nav');
+            var navHeight = nav ? nav.offsetHeight : 70;
+            var links = document.querySelectorAll('.local-nav a, .go-top');
+            for (var i = 0; i < links.length; i++) {
+                links[i].addEventListener('click', function (e) {
+                    var href = this.getAttribute('href');
+                    if (href === "#" || href === "") {
+                        e.preventDefault();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        return;
+                    }
+                    if (href.indexOf('#') === 0) {
+                        e.preventDefault();
+                        var target = document.getElementById(href.substring(1));
+                        if (target) {
+                            var pos = target.getBoundingClientRect().top + window.pageYOffset;
+                            window.scrollTo({ top: pos - navHeight - 10, behavior: 'smooth' });
+                        }
+                    }
+                });
+            }
+        })();
+    </script>
+    <script src="main.js"></script>
+</body>
+
+</html>

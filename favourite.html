@@ -1,0 +1,1558 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="images/x-icon" href="images/logo.png">
+    <title>Pokémon TCG — My Favorites</title>
+    <link rel="stylesheet" href="home.css" />
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Nunito:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome (social icons) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <style>
+      :root {
+        --bg: #f5f5f5;
+        --surface: #ffffff;
+        --card-w: 120px;
+        --radius: 10px;
+        --gold: #f0c040;
+        --gold2: #ffd700;
+        --text: #1a1a2e;
+        --pink: #ff6eb4;
+        --nav-h: 64px;
+        --nav-bg: #1a1a1a;
+        --accent: #3b4cca;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Nunito", sans-serif;
+        min-height: 100vh;
+      }
+
+      .count-badge {
+        background: linear-gradient(135deg, #ff6eb4, #c2185b);
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 800;
+        padding: 0.18rem 0.62rem;
+        border-radius: 999px;
+        box-shadow: 0 2px 10px rgba(255, 110, 180, 0.35);
+        flex-shrink: 0;
+      }
+      .clear-btn {
+        margin-left: auto;
+        padding: 0.34rem 0.88rem;
+        border-radius: 999px;
+        background: rgba(255, 80, 80, 0.15);
+        border: 1.5px solid rgba(255, 80, 80, 0.3);
+        color: rgba(255, 150, 150, 0.9);
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: "Nunito", sans-serif;
+        transition: all 0.18s;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .clear-btn:hover {
+        background: rgba(255, 80, 80, 0.3);
+        color: #ff8080;
+        border-color: rgba(255, 80, 80, 0.6);
+      }
+
+      /* ══ API BAR ══ */
+      .api-bar {
+        background: #fff;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 0.45rem 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+      }
+      .api-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        background: #e8f5e9;
+        border: 1px solid #a5d6a7;
+        border-radius: 6px;
+        padding: 0.2rem 0.65rem;
+        font-size: 0.67rem;
+        font-weight: 800;
+        color: #2e7d32;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+      .live-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #ff6eb4;
+        box-shadow: 0 0 6px #ff6eb4;
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+      .api-method {
+        font-size: 0.62rem;
+        font-weight: 800;
+        color: #43a047;
+        letter-spacing: 0.06em;
+      }
+      .api-endpoint {
+        font-size: 0.67rem;
+        color: #444;
+        font-family: monospace;
+      }
+      #apiStatus {
+        margin-left: auto;
+        font-size: 0.68rem;
+        color: #444;
+        font-weight: 600;
+      }
+
+      /* ══ EMPTY STATE ══ */
+      .hero-empty {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - var(--nav-h) - 44px);
+        gap: 1.2rem;
+        text-align: center;
+        padding: 2rem;
+      }
+      .hero-empty.show {
+        display: flex;
+      }
+      .big-heart {
+        font-size: 6rem;
+        animation: heartFloat 3s ease-in-out infinite;
+      }
+      @keyframes heartFloat {
+        0%,
+        100% {
+          transform: translateY(0) scale(1);
+        }
+        50% {
+          transform: translateY(-14px) scale(1.08);
+        }
+      }
+      .hero-empty h2 {
+        font-family: "Cinzel Decorative", serif;
+        font-size: 1.4rem;
+        color: #3b4cca;
+      }
+      .hero-empty p {
+        font-size: 0.92rem;
+        color: #aaa;
+        max-width: 300px;
+        line-height: 1.6;
+      }
+      .go-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.58rem 1.3rem;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #3b4cca, #1a237e);
+        color: #fff;
+        font-size: 0.86rem;
+        font-weight: 800;
+        text-decoration: none;
+        box-shadow: 0 4px 18px rgba(59, 76, 202, 0.3);
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s;
+      }
+      .go-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(59, 76, 202, 0.45);
+      }
+
+      /* ══ GRID ══ */
+      .grid-section {
+        background: var(--bg);
+        position: relative;
+        z-index: 1;
+        padding: 1.5rem 2rem 4rem;
+        display: none;
+      }
+      .grid-section.show {
+        display: block;
+      }
+      .section-row {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 1.2rem;
+        flex-wrap: wrap;
+      }
+      .section-title {
+        font-family: "Cinzel Decorative", serif;
+        font-size: 0.88rem;
+        color: #3b4cca;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+      #subLabel {
+        font-size: 0.75rem;
+        color: #444;
+      }
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        gap: 12px;
+      }
+
+      /* skeleton */
+      .skeleton {
+        width: 100%;
+        aspect-ratio: 63/88;
+        border-radius: var(--radius);
+        background: linear-gradient(
+          90deg,
+          #e0e0e0 25%,
+          #ececec 50%,
+          #e0e0e0 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.4s infinite;
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      /* ══ CARD ══ */
+      .pcard {
+        width: 100%;
+        aspect-ratio: 63/88;
+        border-radius: var(--radius);
+        position: relative;
+        cursor: pointer;
+        perspective: 800px;
+        overflow: visible;
+      }
+      .pcard:not(.flipped):hover .card-flip-inner {
+        transform: translateY(-6px) scale(1.05);
+      }
+      .pcard:not(.flipped):hover .card-img-wrap {
+        box-shadow:
+          0 14px 40px rgba(0, 0, 0, 0.22),
+          0 0 0 2px #ffcb05;
+      }
+      .card-flip-inner {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: var(--radius);
+      }
+      .pcard.flipped .card-flip-inner {
+        transform: rotateY(180deg);
+      }
+      .card-front,
+      .card-back {
+        position: absolute;
+        inset: 0;
+        border-radius: var(--radius);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      }
+      .card-img-wrap {
+        width: 100%;
+        height: 100%;
+        border-radius: var(--radius);
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        transition: box-shadow 0.18s;
+        background: #e8e8e8;
+      }
+      .card-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.25s;
+      }
+      .pcard:hover .card-img-wrap img {
+        transform: scale(1.04);
+      }
+      .card-img-wrap::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          130deg,
+          rgba(255, 255, 255, 0) 30%,
+          rgba(255, 255, 255, 0.12) 50%,
+          rgba(255, 255, 255, 0) 70%
+        );
+        pointer-events: none;
+      }
+      .card-back {
+        transform: rotateY(180deg);
+        background: linear-gradient(145deg, #1a1040, #2d1b6e, #1a1040);
+        border: 1.5px solid rgba(255, 215, 0, 0.4);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 8px;
+        overflow: hidden;
+      }
+      .card-back::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(
+            circle at 50% 50%,
+            rgba(255, 215, 0, 0.08) 0%,
+            transparent 55%
+          ),
+          repeating-linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.02) 0px,
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px,
+            transparent 12px
+          );
+        border-radius: var(--radius);
+      }
+      .back-ball {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: conic-gradient(#e53935 0deg 180deg, #fff 180deg 360deg);
+        border: 2.5px solid #fff;
+        position: relative;
+        flex-shrink: 0;
+        box-shadow: 0 0 14px rgba(255, 215, 0, 0.25);
+        z-index: 1;
+      }
+      .back-ball::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2.5px solid #333;
+      }
+      .back-name {
+        font-family: "Cinzel Decorative", serif;
+        font-size: 0.5rem;
+        font-weight: 700;
+        color: var(--gold2);
+        text-align: center;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        z-index: 1;
+        position: relative;
+      }
+      .back-type {
+        font-size: 0.38rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 2px 7px;
+        border-radius: 999px;
+        background: var(--tc, #888);
+        color: #fff;
+        z-index: 1;
+        position: relative;
+      }
+      .back-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        width: 100%;
+        z-index: 1;
+        position: relative;
+      }
+      .back-stat-row {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 4px;
+        padding: 2px 5px;
+      }
+      .back-stat-label {
+        font-size: 0.34rem;
+        color: rgba(255, 255, 255, 0.5);
+        font-weight: 700;
+        text-transform: uppercase;
+        width: 20px;
+        flex-shrink: 0;
+      }
+      .back-stat-bar {
+        flex: 1;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+      .back-stat-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--tc, #888), var(--gold2));
+      }
+      .back-stat-val {
+        font-size: 0.38rem;
+        font-weight: 800;
+        color: var(--gold2);
+        width: 20px;
+        text-align: right;
+        flex-shrink: 0;
+      }
+      .back-set {
+        font-size: 0.34rem;
+        color: rgba(255, 255, 255, 0.25);
+        z-index: 1;
+        position: relative;
+        text-align: center;
+      }
+
+      /* remove btn */
+      .remove-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        z-index: 20;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.78rem;
+        line-height: 1;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+        transition:
+          transform 0.2s,
+          background 0.2s;
+      }
+      .remove-btn:hover {
+        transform: scale(1.3);
+        background: #ff4444;
+      }
+      .pcard.removing {
+        animation: cardOut 0.35s ease forwards;
+        pointer-events: none;
+      }
+      @keyframes cardOut {
+        0% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.5;
+          transform: scale(1.08);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(0.6);
+        }
+      }
+
+      /* ══ MODAL ══ */
+      .card-modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 600;
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        padding: 1rem;
+        overflow-y: auto;
+      }
+      .card-modal-overlay.open {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .modal-wrap {
+        display: flex;
+        gap: 2rem;
+        align-items: flex-start;
+        max-width: 700px;
+        width: 100%;
+      }
+      .card-modal-overlay.open .modal-wrap {
+        animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      }
+      @keyframes modalIn {
+        from {
+          transform: scale(0.7);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .modal-card-zone {
+        flex-shrink: 0;
+        width: 230px;
+        perspective: 1000px;
+        position: relative;
+      }
+      .modal-flip-inner {
+        width: 100%;
+        aspect-ratio: 63/88;
+        transform-style: preserve-3d;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 14px;
+        cursor: pointer;
+      }
+      .card-modal-overlay.show-back .modal-flip-inner {
+        transform: rotateY(180deg);
+      }
+      .modal-front,
+      .modal-back {
+        position: absolute;
+        inset: 0;
+        border-radius: 14px;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      }
+      .modal-back {
+        transform: rotateY(180deg);
+      }
+      .modal-front img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 14px;
+        display: block;
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+      }
+      .flip-hint {
+        text-align: center;
+        margin-top: 0.6rem;
+        font-size: 0.67rem;
+        color: rgba(255, 255, 255, 0.5);
+        letter-spacing: 0.06em;
+      }
+      .modal-close {
+        position: absolute;
+        top: -12px;
+        right: -12px;
+        z-index: 10;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #fff;
+        border: 1.5px solid #ddd;
+        color: #555;
+        font-size: 0.85rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+      .modal-close:hover {
+        background: #ff4444;
+        color: #fff;
+        border-color: #ff4444;
+      }
+      .modal-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+        background: #fff;
+        border-radius: 16px;
+        padding: 1.4rem;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+      }
+      .modal-name {
+        font-family: "Cinzel Decorative", serif;
+        font-size: 1.25rem;
+        font-weight: 900;
+        color: #1a1a2e;
+        line-height: 1.2;
+      }
+      .modal-meta {
+        display: flex;
+        gap: 0.55rem;
+        flex-wrap: wrap;
+      }
+      .meta-tag {
+        padding: 0.22rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .tag-type {
+        color: #fff;
+      }
+      .tag-hp {
+        background: rgba(255, 80, 80, 0.12);
+        border: 1px solid rgba(255, 80, 80, 0.25);
+        color: #d32f2f;
+      }
+      .tag-rarity {
+        background: #fff8e1;
+        border: 1px solid #ffe082;
+        color: #f57f17;
+      }
+      .tag-set {
+        background: #f5f5f5;
+        border: 1px solid #ddd;
+        color: #666;
+      }
+      .modal-section-title {
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #aaa;
+      }
+      .modal-attacks {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+      }
+      .attack-row {
+        background: #f8f8f8;
+        border-radius: 10px;
+        padding: 0.55rem 0.75rem;
+        border-left: 3px solid var(--tc, #3b4cca);
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+      }
+      .attack-cost {
+        display: flex;
+        gap: 3px;
+      }
+      .cost-icon {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: var(--tc, #3b4cca);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.48rem;
+        color: #fff;
+      }
+      .attack-name {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #1a1a2e;
+      }
+      .attack-text {
+        font-size: 0.62rem;
+        color: #888;
+        font-style: italic;
+        margin-top: 0.18rem;
+      }
+      .attack-dmg {
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: #3b4cca;
+        flex-shrink: 0;
+      }
+      .modal-weaknesses {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      .weak-tag {
+        padding: 0.2rem 0.62rem;
+        border-radius: 999px;
+        font-size: 0.65rem;
+        font-weight: 700;
+      }
+      .share-section {
+        border-top: 1px solid #eee;
+        padding-top: 0.85rem;
+      }
+      .share-label {
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #bbb;
+        margin-bottom: 0.55rem;
+      }
+      .share-btns {
+        display: flex;
+        gap: 0.45rem;
+        flex-wrap: wrap;
+      }
+      .share-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.42rem;
+        padding: 0.4rem 0.85rem;
+        border-radius: 999px;
+        border: none;
+        font-size: 0.74rem;
+        font-weight: 800;
+        cursor: pointer;
+        text-decoration: none;
+        font-family: "Nunito", sans-serif;
+        transition:
+          transform 0.15s,
+          filter 0.15s;
+        letter-spacing: 0.03em;
+      }
+      .share-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+      }
+      .share-btn i {
+        font-size: 0.78rem;
+      }
+      .btn-facebook {
+        background: #1877f2;
+        color: #fff;
+      }
+      .btn-twitter {
+        background: #000;
+        color: #fff;
+      }
+      .btn-whatsapp {
+        background: #25d366;
+        color: #fff;
+      }
+      .btn-copy {
+        background: #f5f5f5;
+        border: 1.5px solid #ddd;
+        color: #555;
+      }
+      .btn-copy.copied {
+        background: #e8f5e9;
+        border-color: #a5d6a7;
+        color: #2e7d32;
+      }
+
+      /* confirm dialog */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 700;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(6px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      .overlay.show {
+        display: flex;
+      }
+      .dialog {
+        background: #fff;
+        border-radius: 20px;
+        padding: 2rem 2.2rem;
+        max-width: 320px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      }
+      .dialog h3 {
+        font-family: "Cinzel Decorative", serif;
+        font-size: 0.95rem;
+        color: #d32f2f;
+        margin-bottom: 0.55rem;
+      }
+      .dialog p {
+        font-size: 0.86rem;
+        color: #666;
+        margin-bottom: 1.4rem;
+        line-height: 1.5;
+      }
+      .dialog-btns {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+      }
+      .dialog-btns button {
+        padding: 0.42rem 1.1rem;
+        border-radius: 999px;
+        border: none;
+        font-family: "Nunito", sans-serif;
+        font-size: 0.8rem;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .btn-cancel {
+        background: #f5f5f5;
+        color: #666;
+        border: 1.5px solid #ddd;
+      }
+      .btn-cancel:hover {
+        background: #eee;
+        color: #333;
+      }
+      .btn-confirm {
+        background: linear-gradient(135deg, #ff4d4d, #b71c1c);
+        color: #fff;
+        box-shadow: 0 3px 12px rgba(255, 77, 77, 0.3);
+      }
+      .btn-confirm:hover {
+        transform: translateY(-1px);
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(80px);
+        background: #1a1a2e;
+        border: 1px solid rgba(255, 110, 180, 0.4);
+        color: #fff;
+        padding: 0.6rem 1.3rem;
+        border-radius: 999px;
+        font-size: 0.83rem;
+        font-weight: 700;
+        box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 999;
+        white-space: nowrap;
+      }
+      .toast.show {
+        transform: translateX(-50%) translateY(0);
+      }
+
+      @media (max-width: 1100px) {
+        .card-grid {
+          grid-template-columns: repeat(8, 1fr);
+        }
+      }
+      @media (max-width: 800px) {
+        .card-grid {
+          grid-template-columns: repeat(6, 1fr);
+        }
+      }
+      @media (max-width: 500px) {
+        .card-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 580px) {
+        .modal-wrap {
+          flex-direction: column;
+          align-items: center;
+        }
+        .modal-card-zone {
+          width: 170px;
+        }
+        .modal-name {
+          font-size: 1.05rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar" id="navbar"></nav>
+
+    <!-- FAVOURITES TITLE + CONTROLS -->
+    <div class="controls-bar">
+      <span class="section-title">♥ My Favourites</span>
+      <span class="count-badge" id="favCount">0</span>
+      <button class="clear-btn" id="clearAllBtn">🗑 Clear All</button>
+    </div>
+
+    <!-- API BAR -->
+    <div class="api-bar">
+      <div class="api-badge"><span class="live-dot"></span> Live API</div>
+      <span class="api-method">GET</span>
+      <span class="api-endpoint">https://api.pokemontcg.io/v2/cards</span>
+      <span id="apiStatus">Loading favorites…</span>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="hero-empty" id="emptyState">
+      <div class="big-heart">🤍</div>
+      <h2>No Favorites Yet</h2>
+      <p>Go to the Cards page and tap 🤍 on any card to save it here!</p>
+      <a class="go-btn" href="cards.html">← Explore Cards</a>
+    </div>
+
+    <!-- GRID -->
+    <div class="grid-section" id="gridSection">
+      <div class="section-row">
+        <span class="section-title">My Collection</span>
+        <span id="subLabel"></span>
+      </div>
+      <div class="card-grid" id="cardGrid"></div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="card-modal-overlay" id="modalOverlay">
+      <div class="modal-wrap">
+        <div class="modal-card-zone">
+          <div class="modal-flip-inner" id="modalFlip">
+            <div class="modal-front">
+              <button class="modal-close" id="modalClose">✕</button>
+              <img id="modalImg" src="" alt="" />
+            </div>
+            <div class="modal-back" id="modalBack"></div>
+          </div>
+          <div class="flip-hint">click card to flip ↩</div>
+        </div>
+        <div class="modal-info" id="modalInfo"></div>
+      </div>
+    </div>
+
+    <!-- CONFIRM CLEAR DIALOG -->
+    <div class="overlay" id="overlay">
+      <div class="dialog">
+        <h3>Clear All Favorites?</h3>
+        <p>
+          This will remove all <span id="dialogCount">0</span> saved cards. This
+          can't be undone.
+        </p>
+        <div class="dialog-btns">
+          <button class="btn-cancel" id="cancelBtn">Cancel</button>
+          <button class="btn-confirm" id="confirmBtn">Yes, Clear All</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- JQUERY SCRIPT -->
+    <script>
+      $(function () {
+        /* ─── CONFIG ─────────────────────────────── */
+        const API_BASE = "https://api.pokemontcg.io/v2/cards";
+        const API_KEY = ""; // optional: your free key from pokemontcg.io
+
+        /* ─── TYPE META ──────────────────────────── */
+        const TYPE_COLOR = {
+          Fire: "#FF6B35",
+          Water: "#29B6F6",
+          Grass: "#4CAF50",
+          Lightning: "#FDD835",
+          Psychic: "#AB47BC",
+          Dragon: "#7E57C2",
+          Darkness: "#795548",
+          Metal: "#90A4AE",
+          Fighting: "#E53935",
+          Fairy: "#F48FB1",
+          Colorless: "#A1887F",
+        };
+        const TYPE_GLOW = {
+          Fire: "rgba(255,107,53,.4)",
+          Water: "rgba(79,195,247,.4)",
+          Grass: "rgba(102,187,106,.4)",
+          Lightning: "rgba(255,214,0,.4)",
+          Psychic: "rgba(206,147,216,.4)",
+          Dragon: "rgba(126,87,194,.4)",
+          Darkness: "rgba(121,85,72,.3)",
+          Metal: "rgba(144,164,174,.3)",
+          Fighting: "rgba(229,57,53,.4)",
+          Fairy: "rgba(248,187,208,.4)",
+          Colorless: "rgba(161,136,127,.3)",
+        };
+
+        /* ─── STATE ──────────────────────────────── */
+        const currentUser = sessionStorage.getItem("loggedInUser");
+        let favorites = JSON.parse(localStorage.getItem("pkFavs_" + currentUser) || "[]");
+        // cardCache: id → full card object (populated as we fetch)
+        let cardCache = JSON.parse(localStorage.getItem("pkCardCache") || "{}");
+
+        function saveFavs() {
+          const currentUser = sessionStorage.getItem("loggedInUser");
+          localStorage.setItem("pkFavs_" + currentUser, JSON.stringify(favorites));
+        }
+        function saveCache() {
+          localStorage.setItem("pkCardCache", JSON.stringify(cardCache));
+        }
+        function isFav(id) {
+          return favorites.includes(id);
+        }
+
+        /* ─── INIT ───────────────────────────────── */
+        updateFavCount();
+        loadFavorites();
+
+        /* ─── LOAD FAVORITES ───────────────────────
+         * For each saved card id:
+         *   1. Check local cache first (no extra API call needed)
+         *   2. If not cached → jQuery $.ajax GET /cards/{id}
+         *   3. Render as cards arrive (progressive)
+         */
+        function loadFavorites() {
+          if (!favorites.length) {
+            updateUI([]);
+            return;
+          }
+
+          $("#apiStatus").text(
+            "Fetching " +
+              favorites.length +
+              " saved card" +
+              (favorites.length > 1 ? "s" : "") +
+              "…",
+          );
+
+          // show skeletons while loading
+          var $g = $("#cardGrid").empty();
+          $.each(favorites, function () {
+            $g.append($("<div>").addClass("skeleton"));
+          });
+          $("#gridSection").addClass("show");
+          $("#emptyState").removeClass("show");
+
+          // collect cards — use cache or fetch
+          // pre-sized array preserves order; resolved counter tracks both cache hits and API responses
+          var results = new Array(favorites.length);
+          var resolved = 0;
+          var total = favorites.length;
+
+          function checkDone() {
+            resolved++;
+            if (resolved === total) {
+              var valid = results.filter(Boolean);
+              $("#apiStatus").text(
+                "\u2713 " +
+                  valid.length +
+                  " card" +
+                  (valid.length !== 1 ? "s" : "") +
+                  " in your collection",
+              );
+              updateUI(valid);
+            }
+          }
+
+          $.each(favorites, function (i, id) {
+            if (cardCache[id]) {
+              // cache hit — resolve immediately
+              results[i] = cardCache[id];
+              checkDone();
+            } else {
+              // cache miss — fetch from API
+              var idx = i;
+              var headers = {};
+              if (API_KEY) headers["X-Api-Key"] = API_KEY;
+
+              /* jQuery $.ajax — RESTful GET /cards/{id} */
+              $.ajax({
+                url: API_BASE + "/" + id,
+                method: "GET",
+                dataType: "json",
+                headers: headers,
+                success: function (res) {
+                  var card = res.data;
+                  cardCache[id] = card;
+                  saveCache();
+                  results[idx] = card;
+                  checkDone();
+                },
+                error: function () {
+                  results[idx] = null;
+                  checkDone();
+                },
+              });
+            }
+          });
+        }
+
+        /* ─── UPDATE UI ──────────────────────────── */
+        function updateUI(cards) {
+          var count = cards.length;
+          $("#favCount").text(count);
+          $("#subLabel").text(
+            count + " card" + (count !== 1 ? "s" : "") + " collected",
+          );
+
+          if (!count) {
+            $("#emptyState").addClass("show");
+            $("#gridSection").removeClass("show");
+            $("#apiStatus").text("No favorites saved yet");
+            return;
+          }
+
+          $("#emptyState").removeClass("show");
+          $("#gridSection").addClass("show");
+
+          var $g = $("#cardGrid").empty();
+          $.each(cards, function (_, c) {
+            $g.append(buildCard(c));
+          });
+        }
+
+        /* ─── BUILD CARD ─────────────────────────── */
+        function buildCard(c) {
+          var type = (c.types && c.types[0]) || "Colorless";
+          var color = TYPE_COLOR[type] || "#888";
+          var glow = TYPE_GLOW[type] || "rgba(255,255,255,.2)";
+          var imgSrc = c.images?.small || "";
+          var hp = c.hp || "—";
+
+          var hpNum = parseInt(hp) || 60;
+          var hpPct = Math.min(100, Math.round((hpNum / 340) * 100));
+          var atkDmg =
+            c.attacks && c.attacks[0]?.damage
+              ? parseInt(c.attacks[0].damage) || 20
+              : 20;
+          var atkPct = Math.min(100, Math.round((atkDmg / 300) * 100));
+          var spdPct = Math.floor(Math.random() * 45 + 35);
+
+          var $wrap = $("<div>")
+            .addClass("pcard")
+            .css({ "--tc": color, "--glow": glow });
+
+          var $front = $("<div>")
+            .addClass("card-front")
+            .append(
+              $("<div>")
+                .addClass("card-img-wrap")
+                .append(
+                  $("<img>").attr({
+                    src: imgSrc,
+                    alt: c.name,
+                    loading: "lazy",
+                  }),
+                ),
+            );
+
+          var $back = $("<div>")
+            .addClass("card-back")
+            .css("--tc", color)
+            .html(
+              '<div class="back-ball"></div>' +
+                '<div class="back-name">' +
+                c.name +
+                "</div>" +
+                '<div class="back-type">' +
+                type +
+                "</div>" +
+                '<div class="back-stats">' +
+                statRow("HP", hp, hpPct) +
+                statRow("ATK", atkDmg, atkPct) +
+                statRow("SPD", spdPct, spdPct) +
+                "</div>" +
+                '<div class="back-set">' +
+                (c.set?.name || "") +
+                " · " +
+                (c.number || "") +
+                "</div>",
+            );
+
+          var $flipInner = $("<div>")
+            .addClass("card-flip-inner")
+            .append($front)
+            .append($back);
+
+          /* ❤ remove button */
+          var $rm = $("<button>")
+            .addClass("remove-btn")
+            .attr({ "aria-label": "Remove", title: "Remove from favorites" })
+            .text("❤");
+
+          $wrap.append($flipInner).append($rm);
+
+          /* click card → modal */
+          $wrap.on("click", function (e) {
+            if ($(e.target).closest(".remove-btn").length) return;
+            openModal(c);
+          });
+
+          /* click remove → animate out */
+          $rm.on("click", function (e) {
+            e.stopPropagation();
+            $wrap.addClass("removing");
+            setTimeout(function () {
+              favorites = favorites.filter(function (f) {
+                return f !== c.id;
+              });
+              saveFavs();
+              $wrap.remove();
+              // rebuild from remaining DOM cards
+              var remaining = [];
+              $("#cardGrid .pcard").each(function () {
+                var id = $(this).data("cid");
+                if (id && cardCache[id]) remaining.push(cardCache[id]);
+              });
+              $("#favCount").text(favorites.length);
+              $("#subLabel").text(
+                favorites.length +
+                  " card" +
+                  (favorites.length !== 1 ? "s" : "") +
+                  " collected",
+              );
+              if (!favorites.length) updateUI([]);
+              showToast("Removed from Favorites");
+            }, 340);
+          });
+
+          $wrap.data("cid", c.id);
+          return $wrap;
+        }
+
+        function statRow(l, v, p) {
+          return (
+            '<div class="back-stat-row">' +
+            '<span class="back-stat-label">' +
+            l +
+            "</span>" +
+            '<div class="back-stat-bar"><div class="back-stat-fill" style="width:' +
+            p +
+            '%"></div></div>' +
+            '<span class="back-stat-val">' +
+            v +
+            "</span>" +
+            "</div>"
+          );
+        }
+
+        /* ─── MODAL ──────────────────────────────── */
+        function openModal(c) {
+          var type = (c.types && c.types[0]) || "Colorless";
+          var color = TYPE_COLOR[type] || "#888";
+          var imgLg = c.images?.large || c.images?.small || "";
+          var hp = c.hp || "—";
+          var shareText =
+            "Check out this Pokémon TCG card: " +
+            c.name +
+            " (" +
+            type +
+            " · " +
+            hp +
+            "HP) from " +
+            (c.set?.name || "Pokémon TCG") +
+            "!";
+          var shareURL = encodeURIComponent(window.location.href);
+          var shareMsg = encodeURIComponent(shareText);
+
+          $("#modalImg").attr({ src: imgLg, alt: c.name });
+          $("#modalOverlay").css("--tc", color);
+
+          /* big card back */
+          var hpNum = parseInt(hp) || 60;
+          var hpPct = Math.min(100, Math.round((hpNum / 340) * 100));
+          var atkDmg =
+            c.attacks && c.attacks[0]?.damage
+              ? parseInt(c.attacks[0].damage) || 20
+              : 20;
+          var atkPct = Math.min(100, Math.round((atkDmg / 300) * 100));
+          var spdPct = Math.floor(Math.random() * 45 + 35);
+
+          $("#modalBack")
+            .css("--tc", color)
+            .html(
+              '<div style="position:absolute;inset:0;background:linear-gradient(145deg,#1a1040,#2d1b6e,#1a1040);border:2px solid rgba(255,215,0,.45);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;overflow:hidden;">' +
+                '<div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,215,0,.07),transparent 55%),repeating-linear-gradient(45deg,rgba(255,255,255,.02) 0,rgba(255,255,255,.02) 1px,transparent 1px,transparent 14px);border-radius:14px;"></div>' +
+                '<div style="width:72px;height:72px;border-radius:50%;background:conic-gradient(#e53935 0deg 180deg,#fff 180deg 360deg);border:4px solid #fff;position:relative;flex-shrink:0;box-shadow:0 0 24px rgba(255,215,0,.3);z-index:1;"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #333;"></div></div>' +
+                "<div style=\"font-family:'Cinzel Decorative',serif;font-size:.9rem;font-weight:700;color:#ffd700;text-align:center;z-index:1;\">" +
+                c.name +
+                "</div>" +
+                '<div style="font-size:.62rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 12px;border-radius:999px;background:' +
+                color +
+                ';color:#fff;z-index:1;">' +
+                type +
+                "</div>" +
+                '<div style="display:flex;flex-direction:column;gap:5px;width:100%;z-index:1;">' +
+                bigStat("HP", hp, hpPct, color) +
+                bigStat("ATK", atkDmg, atkPct, color) +
+                bigStat("SPD", spdPct, spdPct, color) +
+                "</div>" +
+                (c.attacks
+                  ? '<div style="font-size:.52rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);align-self:flex-start;z-index:1;">Attacks</div>' +
+                    '<div style="display:flex;flex-direction:column;gap:5px;width:100%;z-index:1;">' +
+                    c.attacks
+                      .map(function (a) {
+                        return (
+                          '<div style="display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.3);border-radius:7px;padding:6px 9px;border-left:3px solid ' +
+                          color +
+                          ';"><span style="font-size:.6rem;font-weight:700;color:rgba(255,255,255,.85);flex:1;">' +
+                          a.name +
+                          '</span><span style="font-size:.68rem;font-weight:800;color:#ffd700;">' +
+                          (a.damage || "—") +
+                          "</span></div>"
+                        );
+                      })
+                      .join("") +
+                    "</div>"
+                  : "") +
+                "</div>",
+            );
+
+          /* right info panel */
+          var $info = $("#modalInfo").empty();
+          $info.append($("<div>").addClass("modal-name").text(c.name));
+
+          var $meta = $("<div>").addClass("modal-meta");
+          $meta.append(
+            $("<span>")
+              .addClass("meta-tag tag-type")
+              .css("background", color)
+              .text(type),
+          );
+          if (hp !== "—")
+            $meta.append(
+              $("<span>")
+                .addClass("meta-tag tag-hp")
+                .text(hp + " HP"),
+            );
+          if (c.rarity)
+            $meta.append(
+              $("<span>").addClass("meta-tag tag-rarity").text(c.rarity),
+            );
+          if (c.set?.name)
+            $meta.append(
+              $("<span>").addClass("meta-tag tag-set").text(c.set.name),
+            );
+          $info.append($meta);
+
+          if (c.attacks && c.attacks.length) {
+            $info.append(
+              $("<div>").addClass("modal-section-title").text("Attacks"),
+            );
+            var $atks = $("<div>").addClass("modal-attacks");
+            $.each(c.attacks, function (_, a) {
+              var $row = $("<div>").addClass("attack-row");
+              var $cost = $("<div>").addClass("attack-cost");
+              if (a.cost)
+                $.each(a.cost, function () {
+                  $cost.append($("<div>").addClass("cost-icon").text("●"));
+                });
+              var $nw = $("<div>")
+                .css("flex", "1")
+                .append($("<div>").addClass("attack-name").text(a.name));
+              if (a.text)
+                $nw.append($("<div>").addClass("attack-text").text(a.text));
+              $row
+                .append($cost)
+                .append($nw)
+                .append(
+                  $("<div>")
+                    .addClass("attack-dmg")
+                    .text(a.damage || "—"),
+                );
+              $atks.append($row);
+            });
+            $info.append($atks);
+          }
+
+          if (c.weaknesses && c.weaknesses.length) {
+            $info.append(
+              $("<div>").addClass("modal-section-title").text("Weakness"),
+            );
+            var $wk = $("<div>").addClass("modal-weaknesses");
+            $.each(c.weaknesses, function (_, w) {
+              var wc = TYPE_COLOR[w.type] || "#888";
+              $wk.append(
+                $("<span>")
+                  .addClass("weak-tag")
+                  .css({
+                    background: wc + "33",
+                    border: "1px solid " + wc + "66",
+                    color: wc,
+                  })
+                  .text(w.type + " " + w.value),
+              );
+            });
+            $info.append($wk);
+          }
+
+          /* ── SOCIAL SHARE ── */
+          var $share = $("<div>").addClass("share-section");
+          $share.append(
+            $("<div>").addClass("share-label").text("Share This Card"),
+          );
+          var $btns = $("<div>").addClass("share-btns");
+
+          $btns.append(
+            $("<a>")
+              .addClass("share-btn btn-facebook")
+              .attr({
+                href:
+                  "https://www.facebook.com/sharer/sharer.php?u=" +
+                  shareURL +
+                  "&quote=" +
+                  shareMsg,
+                target: "_blank",
+                rel: "noopener",
+              })
+              .html('<i class="fa-brands fa-facebook-f"></i> Facebook'),
+          );
+
+          $btns.append(
+            $("<a>")
+              .addClass("share-btn btn-twitter")
+              .attr({
+                href:
+                  "https://twitter.com/intent/tweet?text=" +
+                  shareMsg +
+                  "&url=" +
+                  shareURL,
+                target: "_blank",
+                rel: "noopener",
+              })
+              .html('<i class="fa-brands fa-x-twitter"></i> X / Twitter'),
+          );
+
+          $btns.append(
+            $("<a>")
+              .addClass("share-btn btn-whatsapp")
+              .attr({
+                href: "https://wa.me/?text=" + shareMsg + "%20" + shareURL,
+                target: "_blank",
+                rel: "noopener",
+              })
+              .html('<i class="fa-brands fa-whatsapp"></i> WhatsApp'),
+          );
+
+          var $copy = $("<button>")
+            .addClass("share-btn btn-copy")
+            .html('<i class="fa-regular fa-copy"></i> Copy Link');
+          $copy.on("click", function () {
+            navigator.clipboard
+              .writeText(shareText + " " + window.location.href)
+              .then(function () {
+                $copy
+                  .addClass("copied")
+                  .html('<i class="fa-solid fa-check"></i> Copied!');
+                setTimeout(function () {
+                  $copy
+                    .removeClass("copied")
+                    .html('<i class="fa-regular fa-copy"></i> Copy Link');
+                }, 2200);
+              });
+          });
+          $btns.append($copy);
+          $share.append($btns);
+          $info.append($share);
+
+          $("#modalOverlay").removeClass("show-back").addClass("open");
+        }
+
+        function bigStat(l, v, p, color) {
+          return (
+            '<div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border-radius:7px;padding:5px 8px;">' +
+            '<span style="font-size:.52rem;color:rgba(255,255,255,.5);font-weight:700;text-transform:uppercase;width:26px;">' +
+            l +
+            "</span>" +
+            '<div style="flex:1;height:5px;background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden;"><div style="height:100%;width:' +
+            p +
+            "%;border-radius:999px;background:linear-gradient(90deg," +
+            color +
+            ',#ffd700);"></div></div>' +
+            '<span style="font-size:.58rem;font-weight:800;color:#ffd700;width:24px;text-align:right;">' +
+            v +
+            "</span>" +
+            "</div>"
+          );
+        }
+
+        function closeModal() {
+          $("#modalOverlay").removeClass("open");
+          setTimeout(function () {
+            $("#modalOverlay").removeClass("show-back");
+          }, 300);
+        }
+
+        $("#modalFlip").on("click", function () {
+          $("#modalOverlay").toggleClass("show-back");
+        });
+        $("#modalClose").on("click", function (e) {
+          e.stopPropagation();
+          closeModal();
+        });
+        $("#modalOverlay").on("click", function (e) {
+          if ($(e.target).is("#modalOverlay")) closeModal();
+        });
+        $(document).on("keydown", function (e) {
+          if (e.key === "Escape") closeModal();
+        });
+
+        /* ─── CLEAR ALL ──────────────────────────── */
+        $("#clearAllBtn").on("click", function () {
+          if (!favorites.length) return;
+          $("#dialogCount").text(favorites.length);
+          $("#overlay").addClass("show");
+        });
+        $("#cancelBtn").on("click", function () {
+          $("#overlay").removeClass("show");
+        });
+        $("#confirmBtn").on("click", function () {
+          favorites = [];
+          saveFavs();
+          $("#overlay").removeClass("show");
+          updateUI([]);
+          showToast("All favorites cleared");
+        });
+        $("#overlay").on("click", function (e) {
+          if ($(e.target).is("#overlay")) $("#overlay").removeClass("show");
+        });
+
+        /* ─── HELPERS ────────────────────────────── */
+        function updateFavCount() {
+          $("#favCount").text(favorites.length);
+        }
+
+        var toastTimer;
+        function showToast(msg) {
+          clearTimeout(toastTimer);
+          $("#toast").text(msg).addClass("show");
+          toastTimer = setTimeout(function () {
+            $("#toast").removeClass("show");
+          }, 2000);
+        }
+      }); // end document ready
+    </script>
+    <script src="main.js"></script>
+  </body>
+</html>

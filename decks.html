@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="images/x-icon" href="images/logo.png">
+    <title>Pokemon Deck Guide</title>
+    <link rel="stylesheet" href="home.css">
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+            background-color: #f0f2f5;
+            color: #222;
+            margin: 0;
+            padding-top: 50px;
+        }
+
+        header {
+            background-color: #cc0000;
+            color: white;
+            padding: 30px 20px 20px;
+            border-bottom: 4px solid #ffde00;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+            font-size: 32px;
+        }
+
+        header p {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .local-nav {
+            background-color: #222;
+            padding: 12px 10px;
+            top: 60px;
+            z-index: 999;
+            text-align: center;
+        }
+
+        .local-nav a {
+            color: white;
+            margin: 0 12px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .local-nav a:hover {
+            color: #ffde00;
+        }
+
+        .section {
+            margin: 40px auto;
+            max-width: 1000px;
+            background-color: white;
+            border-radius: 16px;
+            padding: 30px 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        .section h2 {
+            text-align: center;
+            color: #000;
+            margin: 0 auto 15px;
+            font-size: 28px;
+            font-weight: bold;
+            padding: 12px 30px;
+            border-radius: 40px;
+            border: 1px solid;
+            display: inline-block;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .title-underline {
+            border: none;
+            border-top: 3px dashed #d4a017;
+            width: 90%;
+            margin: 5px auto 25px;
+        }
+
+        .deck-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .deck-image {
+            flex: 0 0 200px;
+            text-align: center;
+        }
+
+        .deck-image img {
+            max-width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e0c070;
+        }
+
+        .deck-details {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+            background-color: #fff;
+        }
+
+        th {
+            color: #1a1a1a;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #aaa;
+        }
+
+        td {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .fire-table th {
+            background-color: #f8d0d0;
+        }
+
+        .water-table th {
+            background-color: #a0c8f0;
+        }
+
+        .grass-table th {
+            background-color: #b0e8d0;
+        }
+
+        .info-block {
+            border-radius: 20px;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border: 1px solid;
+        }
+
+        .fire-info {
+            background-color: #ffe0e0;
+            border-color: #f5b0b0;
+        }
+
+        .water-info {
+            background-color: #e0f0ff;
+            border-color: #a0c8e8;
+        }
+
+        .grass-info {
+            background-color: #e0fff0;
+            border-color: #a0e0c0;
+        }
+
+        h3 {
+            color: #8b5e3c;
+            margin: 20px 0 10px;
+            border-left: 6px solid #d98c8c;
+            padding-left: 15px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        .builder-area {
+            background-color: #fafafa;
+            padding: 20px;
+            border-radius: 16px;
+            margin-top: 20px;
+            border: 1px solid #e0e0e0;
+        }
+
+        select,
+        button {
+            padding: 10px 16px;
+            font-size: 15px;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            margin: 5px;
+        }
+
+        button {
+            background-color: #cc0000;
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: #a00000;
+        }
+
+        .btn-secondary {
+            background-color: #5a6b7a;
+        }
+
+        .btn-secondary:hover {
+            background-color: #3e4e5e;
+        }
+
+        #decklist {
+            list-style: none;
+            padding: 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        #decklist li {
+            background: white;
+            margin: 6px 0;
+            padding: 8px 14px;
+            border-radius: 30px;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #decklist li button {
+            background-color: #666;
+            padding: 4px 12px;
+            font-size: 13px;
+        }
+
+        .warning-text {
+            color: #cc0000;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #b0bec5, #90a4ae, #b0bec5, transparent);
+            margin: 20px 0;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        footer {
+            background-color: #222;
+            color: #aaa;
+            padding: 25px 20px;
+            font-size: 14px;
+            margin-top: 40px;
+            border-top: 5px solid #cc0000;
+        }
+
+        footer a {
+            color: #ffb3b3;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            color: #ffde00;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .back-link a {
+            color: #ffb3b3;
+        }
+
+        .back-link a:hover {
+            color: #ffde00;
+        }
+
+        .go-top {
+            display: inline-block;
+            margin-top: 10px;
+            background: #333;
+            color: white;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 14px;
+            text-decoration: none;
+            border: 1px solid #cc0000;
+        }
+
+        .go-top:hover {
+            background: #cc0000;
+        }
+
+        @media (max-width: 700px) {
+            .deck-row {
+                flex-direction: column;
+            }
+
+            .deck-image {
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar" id="navbar"></nav>
+
+    <header>
+        <h1>⚡ Pokemon Deck Guide ⚡</h1>
+        <p>Pre-built decks, strategies, and a custom deck builder</p>
+    </header>
+
+    <nav class="local-nav">
+        <a href="#intro">Introduction</a>
+        <a href="#fire">Fire Deck</a>
+        <a href="#water">Water Deck</a>
+        <a href="#grass">Grass Deck</a>
+        <a href="#builder">Deck Builder</a>
+    </nav>
+
+    <hr>
+
+    <div class="section" id="intro">
+        <h2 style="background:#f5b0b0; border-color:#d98c8c;">Introduction</h2>
+        <div class="title-underline"></div>
+        <p>Welcome to the <strong>Pokemon Deck Guide</strong>! This page helps new players build and play effective
+            Pokemon TCG decks. You'll find three complete sample decks — Fire (Charizard), Water (Blastoise), and Grass
+            (Venusaur) — each with a full card list, strategy tips, matchup analysis, and card explanations.</p>
+        <p>Also included is an interactive <strong>Deck Builder</strong> where you can create your own deck by selecting
+            cards. The builder tracks Pokemon, Trainer, and Energy counts and warns if you exceed four copies of a card.
+        </p>
+    </div>
+
+    <hr>
+
+    <!-- Fire Deck -->
+    <div class="section" id="fire">
+        <h2 style="background:#f5b0b0; border-color:#d98c8c;">Fire Deck (Charizard)</h2>
+        <div class="title-underline"></div>
+        <div class="deck-row">
+            <div class="deck-image">
+                <img src="images/charizard.png" alt="Charizard" style="width:100%; max-width:200px;">
+                <p style="margin-top:8px;"><i>Charizard ex</i></p>
+            </div>
+            <div class="deck-details">
+                <h3>Deck List</h3>
+                <table class="fire-table">
+                    <tr>
+                        <th>Type</th>
+                        <th>Card</th>
+                        <th>Quantity</th>
+                    </tr>
+                    <tr>
+                        <td>Pokemon</td>
+                        <td>Charmander</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>Pokemon</td>
+                        <td>Charmeleon</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>Pokemon</td>
+                        <td>Charizard</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>Trainer</td>
+                        <td>Potion</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>Trainer</td>
+                        <td>Professor Research</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>Energy</td>
+                        <td>Fire Energy</td>
+                        <td>20</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <h3>Strategy Tips</h3>
+        <div class="info-block fire-info">
+            <p>Prioritize getting Charmander onto the field early. Use Professor's Research to dig for evolution pieces.
+                Once Charizard is active, its powerful attacks can knock out most Pokemon in one or two hits. Manage
+                Energy carefully.</p>
+        </div>
+        <h3>Matchups</h3>
+        <div class="info-block fire-info">
+            <ul style="margin:0;">
+                <li><strong>Strong vs Grass:</strong> Fire exploits Grass weakness.</li>
+                <li><strong>Weak vs Water:</strong> Water resists Fire.</li>
+                <li><strong>Even vs Psychic:</strong> Apply early pressure.</li>
+            </ul>
+        </div>
+        <h3>Card Explanation</h3>
+        <div class="info-block fire-info">
+            <p><b>Charmander</b> – Basic starter, keep safe.</p>
+            <p><b>Charmeleon</b> – Stage 1 evolution.</p>
+            <p><b>Charizard</b> – Main attacker, huge damage.</p>
+            <p><b>Professor Research</b> – Draw 7 cards.</p>
+            <p><b>Potion</b> – Heal 30 damage.</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Water Deck -->
+    <div class="section" id="water">
+        <h2 style="background:#6a9fc0; border-color:#4a7a9c;">Water Deck (Blastoise)</h2>
+        <div class="title-underline"></div>
+        <div class="deck-row">
+            <div class="deck-image">
+                <img src="images/blastoise.png" alt="Blastoise" style="width:100%; max-width:200px;">
+                <p style="margin-top:8px;"><i>Blastoise</i></p>
+            </div>
+            <div class="deck-details">
+                <h3>Deck List</h3>
+                <table class="water-table">
+                    <tr>
+                        <th>Type</th>
+                        <th>Card</th>
+                        <th>Quantity</th>
+                    </tr>
+                    <tr>
+                        <td>Pokemon</td>
+                        <td>Squirtle</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>Pokemon</td>
+                        <td>Wartortle</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>Pokemon</td>
+                        <td>Blastoise</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>Trainer</td>
+                        <td>Potion</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>Trainer</td>
+                        <td>Professor Research</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>Energy</td>
+                        <td>Water Energy</td>
+                        <td>20</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <h3>Strategy Tips</h3>
+        <div class="info-block water-info">
+            <p>Build your bench patiently. Use Potion to keep Squirtle/Wartortle healthy. Once Blastoise is active, deal
+                consistent damage while your opponent struggles to break through. Use Professor Research for card
+                advantage.</p>
+        </div>
+        <h3>Matchups</h3>
+        <div class="info-block water-info">
+            <ul style="margin:0;">
+                <li><strong>Strong vs Fire:</strong> Water exploits Fire weakness.</li>
+                <li><strong>Weak vs Electric:</strong> Electric threatens Water.</li>
+                <li><strong>Favorable vs Fighting:</strong> Blastoise's HP outlasts them.</li>
+            </ul>
+        </div>
+        <h3>Card Explanation</h3>
+        <div class="info-block water-info">
+            <p><b>Squirtle</b> – Basic starter, evolve quickly.</p>
+            <p><b>Wartortle</b> – Stage 1, durable.</p>
+            <p><b>Blastoise</b> – Solid attacker with high HP.</p>
+            <p><b>Professor Research</b> – Refresh hand.</p>
+            <p><b>Potion</b> – Enhance defense.</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Grass Deck -->
+    <div class="section" id="grass">
+        <h2 style="background:#a0d8c0; border-color:#70b89c;">Grass Deck (Venusaur)</h2>
+        <div class="title-underline"></div>
+        <div class="deck-row">
+            <div class="deck-image">
+                <img src="images/venusaur.png" alt="Venusaur" style="width:100%; max-width:200px;">
+                <p style="margin-top:8px;"><i>Venusaur</i></p>
+            </div>
+            <div class="deck-details">
+                <h3>Deck List</h3>
+                <table class="grass-table">
+                    <tr>
+                        <th>Type</th>
+                        <th>Card</th>
+                        <th>Quantity</th>
+                    </tr>
+                    <tr>
+                        <td>Pokemon</td>
+                        <td>Bulbasaur</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>Pokemon</td>
+                        <td>Ivysaur</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>Pokemon</td>
+                        <td>Venusaur</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>Trainer</td>
+                        <td>Potion</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>Trainer</td>
+                        <td>Professor Research</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>Energy</td>
+                        <td>Grass Energy</td>
+                        <td>20</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <h3>Strategy Tips</h3>
+        <div class="info-block grass-info">
+            <p>Evolve Bulbasaur quickly. Venusaur's healing plus Potion makes it extremely durable. Don't rush; let your
+                opponent waste resources. Use Professor Research to find pieces.</p>
+        </div>
+        <h3>Matchups</h3>
+        <div class="info-block grass-info">
+            <ul style="margin:0;">
+                <li><strong>Strong vs Water:</strong> Grass advantage over Water.</li>
+                <li><strong>Weak vs Fire:</strong> Fire deals double damage.</li>
+                <li><strong>Even vs Psychic:</strong> Healing tips the balance.</li>
+            </ul>
+        </div>
+        <h3>Card Explanation</h3>
+        <div class="info-block grass-info">
+            <p><b>Bulbasaur</b> – Basic starter, protect it.</p>
+            <p><b>Ivysaur</b> – Stage 1, moderate HP.</p>
+            <p><b>Venusaur</b> – Reliable attacker with healing.</p>
+            <p><b>Professor Research</b> – Draw into evolutions.</p>
+            <p><b>Potion</b> – Extra recovery.</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Deck Builder -->
+    <div class="section" id="builder">
+        <h2 style="background:#f5b0b0; border-color:#d98c8c;">Build Your Own Deck</h2>
+        <div class="title-underline"></div>
+        <div class="builder-area">
+            <label for="cardSelect"><b>Select a card:</b></label>
+            <select id="cardSelect">
+                <option>Pikachu</option>
+                <option>Raichu</option>
+                <option>Charmander</option>
+                <option>Charmeleon</option>
+                <option>Charizard</option>
+                <option>Squirtle</option>
+                <option>Wartortle</option>
+                <option>Blastoise</option>
+                <option>Bulbasaur</option>
+                <option>Ivysaur</option>
+                <option>Venusaur</option>
+                <option>Eevee</option>
+                <option>Snorlax</option>
+                <option>Potion</option>
+                <option>Professor Research</option>
+                <option>Switch</option>
+                <option>Great Ball</option>
+                <option>Ultra Ball</option>
+                <option>Rare Candy</option>
+                <option>Boss's Orders</option>
+                <option>Fire Energy</option>
+                <option>Water Energy</option>
+                <option>Grass Energy</option>
+                <option>Electric Energy</option>
+                <option>Psychic Energy</option>
+                <option>Fighting Energy</option>
+                <option>Darkness Energy</option>
+                <option>Metal Energy</option>
+            </select>
+            <button id="addBtn">Add Card</button>
+            <button id="clearBtn" class="btn-secondary">Clear Deck</button>
+            <h3>Your Deck <span id="warningMsg" class="warning-text"></span></h3>
+            <ul id="decklist"></ul>
+            <h3>Deck Statistics</h3>
+            <p>Pokemon: <span id="pokemonCount">0</span> &nbsp; Trainer: <span id="trainerCount">0</span> &nbsp; Energy:
+                <span id="energyCount">0</span> &nbsp; Total: <span id="totalCount">0</span></p>
+            <p style="font-size:13px; color:#666;">* Max 4 copies per card.</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <footer>
+        <p class="back-link"><a href="beginner.html">▶ Back to Tutorial</a></p>
+        <p style="margin-top: 10px;">Pokemon Deck Guide — Beginner Friendly</p>
+        <a href="#" class="go-top">↑ Back to top</a>
+        <p style="margin-top: 14px; opacity: 0.8;">⚪ ⚫ ⚪ Build, battle, win!</p>
+    </footer>
+
+    <script>
+        var pokemonCount = 0, trainerCount = 0, energyCount = 0, cardCounts = {};
+        var pokemonSpan = document.getElementById("pokemonCount"), trainerSpan = document.getElementById("trainerCount");
+        var energySpan = document.getElementById("energyCount"), totalSpan = document.getElementById("totalCount");
+        var warningSpan = document.getElementById("warningMsg"), decklistUl = document.getElementById("decklist");
+        var cardSelect = document.getElementById("cardSelect");
+
+        function isPokemon(card) {
+            var list = ["Pikachu", "Raichu", "Charmander", "Charmeleon", "Charizard", "Squirtle", "Wartortle", "Blastoise", "Bulbasaur", "Ivysaur", "Venusaur", "Eevee", "Snorlax"];
+            for (var i = 0; i < list.length; i++) if (card === list[i]) return true;
+            return false;
+        }
+        function isTrainer(card) {
+            var list = ["Potion", "Professor Research", "Switch", "Great Ball", "Ultra Ball", "Rare Candy", "Boss's Orders"];
+            for (var i = 0; i < list.length; i++) if (card === list[i]) return true;
+            return false;
+        }
+        function updateUI() {
+            pokemonSpan.innerHTML = pokemonCount; trainerSpan.innerHTML = trainerCount;
+            energySpan.innerHTML = energyCount; totalSpan.innerHTML = pokemonCount + trainerCount + energyCount;
+            var msg = "";
+            for (var c in cardCounts) if (cardCounts[c] > 4) { msg = "Warning: " + c + " has " + cardCounts[c] + " copies (max 4)!"; break; }
+            warningSpan.innerHTML = msg;
+        }
+        function addCardToDeck(card) {
+            if (cardCounts[card] >= 4) { alert("You already have 4 copies of " + card + "."); return false; }
+            var li = document.createElement("li"); li.innerHTML = card + " ";
+            var btn = document.createElement("button"); btn.innerHTML = "Remove";
+            btn.onclick = function () {
+                decklistUl.removeChild(li);
+                if (isPokemon(card)) pokemonCount--; else if (isTrainer(card)) trainerCount--; else energyCount--;
+                cardCounts[card]--; if (cardCounts[card] === 0) delete cardCounts[card];
+                updateUI();
+            };
+            li.appendChild(btn); decklistUl.appendChild(li);
+            cardCounts[card] = cardCounts[card] ? cardCounts[card] + 1 : 1;
+            if (isPokemon(card)) pokemonCount++; else if (isTrainer(card)) trainerCount++; else energyCount++;
+            updateUI(); return true;
+        }
+        function addCard() { addCardToDeck(cardSelect.value); }
+        function clearDeck() {
+            while (decklistUl.firstChild) decklistUl.removeChild(decklistUl.firstChild);
+            pokemonCount = trainerCount = energyCount = 0; cardCounts = {}; updateUI();
+        }
+        document.getElementById("addBtn").onclick = addCard;
+        document.getElementById("clearBtn").onclick = clearDeck;
+        (function () {
+            var nav = document.querySelector('.local-nav'); 
+            var navHeight = nav ? nav.offsetHeight : 70;
+            var links = document.querySelectorAll('.local-nav a, footer a[href*="#"]');
+            for (var i = 0; i < links.length; i++) {
+                links[i].onclick = function (e) {
+                    var href = this.getAttribute('href');
+                    if (!href || href === "#" || href === "") return;
+                    if (href.indexOf('#') === 0) {
+                        e.preventDefault();
+                        var target = document.getElementById(href.substring(1));
+                        if (target) {
+                            var pos = target.getBoundingClientRect().top + window.pageYOffset;
+                            window.scrollTo({ top: pos - navHeight - 10, behavior: 'smooth' });
+                        }
+                    }
+                };
+            }
+        })();
+    </script>
+    <script src="main.js"></script>
+</body>
+
+</html>
